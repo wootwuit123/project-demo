@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>แจ้งซ่อม - ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?!= include('style'); ?>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
+  <style>
+    /*
+      CSS styles for the report_repair.html page.
+      These styles are specific to this page or override default styles from 'style.html'.
+    */
+    body {
+      background: linear-gradient(to bottom right, #e0f2f7, #c1e4f3); /* Soft blue gradient background */
+      color: #333;
+      display: block;
+      padding-top: 0;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif; /* Using Inter font */
+    }
+
+    /* Top Navigation Bar */
+    .topnav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #007bff; /* Primary blue color */
+      padding: 0 1.5rem;
+      height: 60px; /* Slightly taller nav */
+      color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .topnav .title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .topnav .menu {
+      display: flex;
+      gap: 1.5rem; /* Increased gap */
+    }
+    .topnav .menu a {
+      color: #e0f7fa; /* Lighter text for contrast */
+      text-decoration: none;
+      font-size: 1rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px; /* Rounded buttons */
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .topnav .menu a.active,
+    .topnav .menu a:hover {
+      background-color: rgba(255,255,255,0.15); /* Subtle hover/active effect */
+      transform: translateY(-2px); /* Slight lift on hover */
+      color: #fff;
+    }
+
+    /* Main Content Container */
+    .container {
+      max-width: 700px; /* Wider container */
+      margin: 2.5rem auto; /* More vertical margin */
+      padding: 2rem; /* More internal padding */
+      background: #ffffff;
+      border-radius: 16px; /* More rounded corners */
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15); /* Deeper shadow */
+      animation: fadeIn 0.8s ease-out; /* Fade-in animation */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.8rem;
+      font-weight: 700; /* Bolder title */
+      font-size: 2.5rem; /* Larger title */
+      color: #0056b3; /* Darker blue for emphasis */
+    }
+
+    .subtitle {
+      margin: 0 0 2rem; /* More space below subtitle */
+      color: #666;
+      font-size: 1.15rem; /* Slightly larger subtitle */
+      line-height: 1.5;
+      text-align: center;
+      border-bottom: 1px solid #eee; /* Separator line */
+      padding-bottom: 1.5rem;
+    }
+
+    /* Form Group Styling */
+    .form-group {
+      margin-bottom: 1.5rem; /* Increased spacing between form groups */
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.6rem; /* More space below label */
+      font-weight: 600; /* Bolder label */
+      color: #444;
+      font-size: 1rem;
+    }
+    .form-group label .required {
+      color: #dc3545; /* Red for required fields */
+      font-weight: bold;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="tel"],
+    .form-group textarea,
+    .form-group select,
+    .form-group input[type="file"] {
+      width: 100%;
+      padding: 1rem 1.2rem; /* More padding for larger input fields */
+      border: 1px solid #cceeff; /* Lighter, subtle blue border */
+      border-radius: 10px; /* Softer rounded corners */
+      font-size: 1.05rem; /* Slightly larger text in inputs */
+      box-sizing: border-box;
+      background-color: #f8fcfd; /* Very light blue background */
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus,
+    .form-group input[type="file"]:focus {
+      outline: none;
+      border-color: #007bff; /* Primary blue on focus */
+      box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25); /* Stronger focus glow */
+    }
+    .form-group .help-text {
+      font-size: 0.88rem; /* Slightly larger help text */
+      color: #777;
+      margin-top: 0.4rem;
+      padding-left: 0.2rem;
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px; /* Taller textarea */
+    }
+
+    .radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.2rem; /* More space between radio options */
+        margin-top: 0.8rem;
+    }
+
+    .radio-group label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-weight: normal;
+        color: #333;
+        margin-bottom: 0;
+        padding: 0.8rem 1.2rem; /* More padding */
+        border-radius: 10px; /* Rounded */
+        border: 1px solid #d0e8f2; /* Light border */
+        background-color: #eaf8ff; /* Lightest blue background */
+        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .radio-group label:hover {
+        background-color: #cceeff; /* Slightly darker blue on hover */
+        border-color: #007bff;
+    }
+
+    /* Hide default radio input */
+    .radio-group input[type="radio"] {
+        display: none;
+    }
+
+    /* Custom radio indicator */
+    .radio-group input[type="radio"] + span::before {
+        content: '';
+        display: inline-block;
+        width: 18px; /* Larger custom radio */
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid #007bff; /* Blue border */
+        margin-right: 10px;
+        vertical-align: middle;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    /* Checked state for custom radio */
+    .radio-group input[type="radio"]:checked + span::before {
+        background-color: #007bff; /* Blue fill when checked */
+        border-color: #007bff;
+        box-shadow: inset 0 0 0 4px white; /* Inner white circle */
+    }
+    
+    .radio-group input[type="radio"]:checked + span {
+        font-weight: 600; /* Bolder text for checked item */
+        color: #0056b3;
+    }
+    .radio-group input[type="radio"]:checked + span::after {
+        content: '\2713'; /* Checkmark icon */
+        font-family: 'Font Awesome 6 Free'; /* Requires Font Awesome */
+        font-weight: 900;
+        position: absolute;
+        left: 17px; /* Adjust position */
+        color: white;
+        font-size: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* Button Group */
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem; /* More space above buttons */
+    }
+    .button-group button {
+      flex-grow: 1;
+      padding: 1rem 1.5rem; /* Larger padding for buttons */
+      font-size: 1.1rem; /* Larger button text */
+      border-radius: 10px; /* Softer rounded corners */
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-weight: 600;
+    }
+
+    /* Primary Button */
+    .button-group button.primary {
+      background: linear-gradient(135deg, #007bff, #0056b3); /* Blue gradient */
+      color: white;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    }
+    .button-group button.primary:hover {
+      background: linear-gradient(135deg, #0056b3, #004085);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+    }
+    .button-group button.primary:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    }
+
+    /* Secondary Button */
+    .button-group button.secondary {
+      background: #6c757d; /* Grey color */
+      color: white;
+      box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+    }
+    .button-group button.secondary:hover {
+      background: #545b62;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(108, 117, 125, 0.4);
+    }
+    .button-group button.secondary:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(108, 117, 125, 0.2);
+    }
+
+    /* Loading Overlay and Modal */
+    .loading-overlay, .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .loading-content, .modal-content {
+      background: #fff;
+      padding: 2.5rem 3rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      text-align: center;
+      max-width: 450px;
+      animation: zoomIn 0.3s ease-out;
+    }
+    .modal-content h3 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #0056b3;
+    }
+    .modal-content p {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+    .modal-close-button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .modal-close-button:hover {
+      background: #0056b3;
+    }
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Responsive Adjustments for smaller screens */
+    @media (max-width: 768px) {
+      .topnav {
+        flex-direction: column;
+        height: auto;
+        padding: 0.8rem 1rem;
+        gap: 0.5rem;
+      }
+      .topnav .title {
+        text-align: center;
+        width: 100%;
+        font-size: 1.1rem;
+      }
+      .topnav .menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.8rem;
+        margin-top: 0.5rem;
+      }
+      .topnav .menu a {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+      }
+      .container {
+        margin: 1rem auto;
+        padding: 1.2rem;
+        border-radius: 12px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        font-size: 0.95rem;
+      }
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        padding: 0.8rem;
+        font-size: 0.95rem;
+      }
+      .radio-group {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      .radio-group label {
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+      }
+      .radio-group input[type="radio"] + span::before {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+      }
+      .radio-group input[type="radio"]:checked + span::after {
+        left: 15px;
+        font-size: 10px;
+      }
+      .button-group {
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-top: 1.5rem;
+      }
+      .button-group button {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        font-size: 1rem;
+      }
+      .loading-content, .modal-content {
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+      }
+      .modal-content h3 {
+        font-size: 1.5rem;
+      }
+      .modal-content p {
+        font-size: 1rem;
+      }
+      .modal-close-button {
+        padding: 0.7rem 1.5rem;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="topnav">
+    <div class="title"><i class="fas fa-bolt"></i> ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</div>
+    <div class="menu">
+      <a onclick="loadDashboard()"><i class="fas fa-home"></i> หน้าหลัก</a>
+      <a class="active" onclick="loadReportRepair()"><i class="fas fa-plus-circle"></i> แจ้งซ่อมใหม่</a>
+      <a onclick="loadStatus()"><i class="fas fa-tools"></i> จัดการแจ้งซ่อม</a>
+      <a onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+    </div>
+  </nav>
+
+  <!-- Main Content Container (Form) -->
+  <div class="container">
+    <h1>แจ้งซ่อม</h1>
+    <p class="subtitle">
+      โปรดแจ้งรายละเอียดของปัญหาและข้อมูลที่เกี่ยวข้อง
+    </p>
+
+    <form id="repair-form">
+      <div class="form-section-title">
+        <h2>ข้อมูลผู้แจ้ง</h2>
+      </div>
+      <div class="form-group">
+        <label for="reporterName">ชื่อ-สกุลผู้แจ้ง: <span class="required">*</span></label>
+        <input type="text" id="reporterName" name="reporterName" placeholder="เช่น นายสมชาย ใจดี" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="phoneNumber">เบอร์โทรศัพท์: <span class="required">*</span></label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="เช่น 0812345678" required pattern="[0-9]{10,12}">
+        <div class="help-text">รองรับเบอร์โทรศัพท์ 10-12 หลัก (ตัวเลขเท่านั้น)</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="department">หน่วยงาน:</label>
+        <input type="text" id="department" name="department" placeholder="หน่วยงานที่สังกัด (ไม่บังคับ)">
+      </div>
+      
+      <div class="form-group">
+        <label for="citizenID">หมายเลขประจำตัวประชาชน:</label>
+        <input type="text" id="citizenID" name="citizenID" placeholder="13 หลัก (ไม่บังคับ)" maxlength="13" pattern="[0-9]{13}">
+        <div class="help-text">ไม่บังคับ แต่จะช่วยให้การติดตามผลการซ่อมแซมดีขึ้น</div>
+      </div>
+
+      <div class="form-section-title" style="margin-top: 2.5rem;">
+        <h2>รายละเอียดการแจ้งซ่อม</h2>
+      </div>
+      <div class="form-group">
+        <label for="location">สถานที่เกิดเหตุ: <span class="required">*</span></label>
+        <input type="text" id="location" name="location" placeholder="เช่น 123 หมู่ 5 ต.บ้านเหนือ อ.เมือง จ.เชียงใหม่" required>
+      </div>
+      
+      <div class="form-group">
+        <label>ประเภทการแจ้งซ่อม: <span class="required">*</span></label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="repairType" value="ไฟฟ้าสาธารณะ" required>
+            <span><i class="fas fa-lightbulb"></i> ไฟฟ้าสาธารณะ</span>
+          </label>
+          <label>
+            <input type="radio" name="repairType" value="ถนน/ทางเท้า" required>
+            <span><i class="fas fa-road"></i> ถนน/ทางเท้า</span>
+          </label>
+          <label>
+            <input type="radio" name="repairType" value="น้ำประปา" required>
+            <span><i class="fas fa-faucet"></i> น้ำประปา</span>
+          </label>
+          <label>
+            <input type="radio" name="repairType" value="อื่นๆ" required>
+            <span><i class="fas fa-ellipsis-h"></i> อื่นๆ</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="repairDesc">รายละเอียดปัญหา: <span class="required">*</span></label>
+        <textarea id="repairDesc" name="repairDesc" placeholder="อธิบายปัญหา เช่น หลอดไฟเสีย, สายไฟขาด, น้ำรั่ว, ถนนชำรุด" rows="5" required></textarea>
+        <div class="help-text">กรอกรายละเอียดปัญหาให้ครบถ้วนและชัดเจนที่สุด</div>
+      </div>
+      
+      <!-- File Upload Section for Photo -->
+      <div class="form-section-title" style="margin-top: 2.5rem;">
+        <h2>แนบรูปภาพ</h2>
+      </div>
+      <div class="form-group">
+        <label for="photoUpload">เลือกไฟล์รูปภาพ:</label>
+        <input type="file" id="photoUpload" name="photoUpload" accept="image/*">
+        <div class="help-text">* รองรับไฟล์รูปภาพเท่านั้น (JPG, PNG, GIF) ขนาดไม่เกิน 5MB</div>
+        <div id="photoPreviewContainer" class="file-upload-preview" style="display: none;">
+          <img id="photoPreview" src="" alt="Photo Preview">
+          <span id="photoFileName"></span>
+          <button type="button" onclick="clearPhotoSelection()">ลบ</button>
+        </div>
+      </div>
+
+      <div class="form-section-title" style="margin-top: 2.5rem;">
+        <h2>ข้อมูลพิกัด</h2>
+      </div>
+      <div class="form-group">
+        <label for="geoStamp">ประทับเวลาทางภูมิศาสตร์:</label>
+        <input type="text" id="geoStamp" name="geoStamp" placeholder="เช่น 2024-06-27 10:30:00">
+        <div class="help-text">วันที่และเวลาที่เกิดเหตุหรือบันทึกข้อมูล</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="geoCode">พิกัดทางภูมิศาสตร์ (ละติจูด, ลองจิจูด):</label>
+        <input type="text" id="geoCode" name="geoCode" placeholder="เช่น 13.7563, 100.5018">
+        <div class="help-text">ตัวอย่าง: ละติจูด, ลองจิจูด</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="geoAddress">ที่อยู่จากพิกัด:</label>
+        <input type="text" id="geoAddress" name="geoAddress" placeholder="เช่น 123 ถนนสุขุมวิท เขตวัฒนา กรุงเทพฯ 10110">
+        <div class="help-text">ที่อยู่แบบเต็มที่เกี่ยวข้องกับพิกัด</div>
+      </div>
+      
+      <div class="button-group">
+        <button type="button" class="primary" onclick="submitRepair()" id="submit-btn">
+          <i class="fas fa-paper-plane"></i> ส่งแจ้งซ่อม
+        </button>
+        <button type="button" class="secondary" onclick="loadDashboard()">
+          <i class="fas fa-times-circle"></i> ยกเลิก
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p id="loading-message">กำลังดำเนินการ...</p>
+    </div>
+  </div>
+
+  <!-- Custom Modal for messages -->
+  <div id="custom-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 id="modal-title">แจ้งเตือน</h3>
+      <p id="modal-message"></p>
+      <button class="modal-close-button" onclick="hideModal()">ตกลง</button>
+    </div>
+  </div>
+
+  <script>
+    // Global variables to store Base64 image data and file name for upload
+    var selectedImageBase64 = null;
+    var selectedImageFileName = null;
+
+    /**
+     * Logs debug messages to the console.
+     * @param {string} message The message to log.
+     */
+    function debugLog(message) {
+      console.log('🔧 REPORT DEBUG:', message);
+    }
+
+    /**
+     * Displays a custom modal dialog with a given message and title.
+     * @param {string} message The message to display.
+     * @param {string} [title='แจ้งเตือน'] The title of the modal.
+     * @returns {Promise<void>} A promise that resolves when the modal is closed.
+     */
+    function showModal(message, title = 'แจ้งเตือน') {
+      return new Promise(resolve => {
+        const modal = document.getElementById('custom-modal');
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-message').innerHTML = message;
+        modal.style.display = 'flex';
+        document.querySelector('.modal-close-button').onclick = () => {
+          hideModal();
+          resolve();
+        };
+      });
+    }
+
+    /**
+     * Hides the custom modal dialog.
+     */
+    function hideModal() {
+      document.getElementById('custom-modal').style.display = 'none';
+    }
+
+    /**
+     * Displays the loading overlay with a given message.
+     * @param {string} [message='กำลังดำเนินการ...'] The message to display in the loading overlay.
+     */
+    function showLoading(message = 'กำลังดำเนินการ...') {
+      document.getElementById('loading-message').textContent = message;
+      document.getElementById('loading-overlay').style.display = 'flex';
+    }
+
+    /**
+     * Hides the loading overlay.
+     */
+    function hideLoading() {
+      document.getElementById('loading-overlay').style.display = 'none';
+    }
+
+    // --- Navigation Functions ---
+    // These functions use google.script.run to load different HTML pages from Code.gs.
+
+    /**
+     * Loads the Dashboard page.
+     */
+    function loadDashboard() {
+      debugLog('loadDashboard called');
+      try {
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          throw new Error('Google Apps Script is not available. Please ensure the app is deployed correctly.');
+        }
+        showLoading('กำลังโหลดหน้าหลัก...');
+        google.script.run
+          .withSuccessHandler(html => { 
+            hideLoading();
+            document.open(); 
+            document.write(html); 
+            document.close(); 
+          })
+          .withFailureHandler(e => { 
+            hideLoading();
+            showModal('เกิดข้อผิดพลาดในการโหลดหน้าหลัก: ' + e.message, 'ข้อผิดพลาด');
+          })
+          .getDashboardPage(); // Calls getDashboardPage function in Code.gs
+      } catch (error) {
+        hideLoading();
+        showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
+      }
+    }
+
+    /**
+     * Loads the Report Repair page.
+     * (Typically, this function is called when navigating to this page,
+     * so a full reload might not be necessary if already on the page.)
+     */
+    function loadReportRepair() {
+      debugLog('loadReportRepair called');
+      try {
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          throw new Error('Google Apps Script is not available. Please ensure the app is deployed correctly.');
+        }
+        showLoading('กำลังโหลดหน้าแจ้งซ่อม...');
+        google.script.run
+          .withSuccessHandler(html => {
+            hideLoading();
+            document.open();
+            document.write(html);
+            document.close();
+          })
+          .withFailureHandler(e => {
+            hideLoading();
+            showModal('เกิดข้อผิดพลาดในการโหลดหน้าแจ้งซ่อม: ' + e.message, 'ข้อผิดพลาด');
+          })
+          .getReportRepairPage(); // Calls getReportRepairPage function in Code.gs
+      } catch (error) {
+        hideLoading();
+        showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
+      }
+    }
+
+    /**
+     * Loads the Status page.
+     */
+    function loadStatus() {
+      debugLog('loadStatus called');
+      try {
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          throw new Error('Google Apps Script is not available. Please ensure the app is deployed correctly.');
+        }
+        showLoading('กำลังโหลดหน้าจัดการแจ้งซ่อม...');
+        google.script.run
+          .withSuccessHandler(html => { 
+            hideLoading();
+            document.open(); 
+            document.write(html); 
+            document.close(); 
+          })
+          .withFailureHandler(e => { 
+            hideLoading();
+            showModal('เกิดข้อผิดพลาดในการโหลดหน้าจัดการแจ้งซ่อม: ' + e.message, 'ข้อผิดพลาด');
+          })
+          .getStatusPage(); // Calls getStatusPage function in Code.gs
+      } catch (error) {
+        hideLoading();
+        showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
+      }
+    }
+
+    /**
+     * Logs out the user and redirects to the login page.
+     */
+    function logout() {
+      debugLog('logout called');
+      showModal('คุณต้องการออกจากระบบหรือไม่?', 'ยืนยันการออกจากระบบ').then(() => {
+        try {
+          if (typeof google === 'undefined' || !google.script || !google.script.run) {
+            throw new Error('Google Apps Script is not available. Please ensure the app is deployed correctly.');
+          }
+          showLoading('กำลังออกจากระบบ...');
+          google.script.run
+            .withSuccessHandler(html => { 
+              hideLoading();
+              document.open(); 
+              document.write(html); 
+              document.close(); 
+            })
+            .withFailureHandler(e => { 
+              hideLoading();
+              showModal('เกิดข้อผิดพลาดในการออกจากระบบ: ' + e.message, 'ข้อผิดพลาด');
+            })
+            .doLogout(); // Calls doLogout function in Code.gs
+        } catch (error) {
+          hideLoading();
+          showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
+        }
+      });
+    }
+
+    // --- File Upload Handling ---
+
+    // Event listener for when a file is selected in the photo upload input.
+    document.addEventListener('DOMContentLoaded', function() {
+      const photoUploadInput = document.getElementById('photoUpload');
+      const photoPreviewContainer = document.getElementById('photoPreviewContainer');
+      const photoPreviewImg = document.getElementById('photoPreview');
+      const photoFileNameSpan = document.getElementById('photoFileName');
+
+      photoUploadInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          // Validate file type (image/* is already in accept attribute, but double check)
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if (!allowedTypes.includes(file.type)) {
+            showModal('กรุณาเลือกไฟล์รูปภาพ (JPG, PNG, GIF) เท่านั้น', 'รูปแบบไฟล์ไม่ถูกต้อง');
+            photoUploadInput.value = ''; // Clear file input
+            clearPhotoSelection();
+            return;
+          }
+
+          // Validate file size (max 5MB)
+          const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+          if (file.size > maxSize) {
+            showModal('ขนาดไฟล์รูปภาพต้องไม่เกิน 5MB', 'ไฟล์ขนาดใหญ่เกินไป');
+            photoUploadInput.value = ''; // Clear file input
+            clearPhotoSelection();
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            selectedImageBase64 = e.target.result; // Store Base64 data
+            selectedImageFileName = file.name; // Store file name
+
+            photoPreviewImg.src = selectedImageBase64;
+            photoFileNameSpan.textContent = file.name;
+            photoPreviewContainer.style.display = 'flex'; // Show preview container
+            debugLog(`Image selected: ${file.name}, size: ${file.size} bytes`);
+          };
+          reader.readAsDataURL(file); // Read file as Base64 data URL
+        } else {
+          clearPhotoSelection(); // Clear selection if no file or canceled
+        }
+      });
+    });
+
+    /**
+     * Clears the selected photo and resets the preview.
+     */
+    function clearPhotoSelection() {
+      selectedImageBase64 = null;
+      selectedImageFileName = null;
+      document.getElementById('photoUpload').value = ''; // Clear the file input element
+      document.getElementById('photoPreview').src = '';
+      document.getElementById('photoFileName').textContent = '';
+      document.getElementById('photoPreviewContainer').style.display = 'none'; // Hide preview container
+      debugLog('Photo selection cleared.');
+    }
+
+    // --- Form Submission Logic ---
+
+    /**
+     * Collects form data, performs client-side validation, and sends data to Google Apps Script.
+     */
+    function submitRepair() {
+      debugLog('submitRepair called');
+      const form = document.getElementById('repair-form');
+      const submitBtn = document.getElementById('submit-btn');
+
+      // Client-side validation for required fields
+      const reporterName = document.getElementById('reporterName').value.trim();
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const repairType = document.querySelector('input[name="repairType"]:checked');
+      const repairDesc = document.getElementById('repairDesc').value.trim();
+      const citizenID = document.getElementById('citizenID').value.trim(); // Get citizen ID (optional)
+
+      // Get manually entered geo data
+      const geoStamp = document.getElementById('geoStamp').value.trim();
+      const geoCode = document.getElementById('geoCode').value.trim();
+      const geoAddress = document.getElementById('geoAddress').value.trim();
+
+      // Check if required fields are filled
+      if (!reporterName || !phoneNumber || !location || !repairType || !repairDesc) {
+        showModal('กรุณากรอกข้อมูลที่มีเครื่องหมายดอกจัน (*) ให้ครบถ้วน', 'ข้อมูลไม่ครบถ้วน');
+        return;
+      }
+
+      // Validate phone number format (10-12 digits, allowing spaces/hyphens)
+      if (!/^[0-9]{10,12}$/.test(phoneNumber.replace(/[-\s]/g, ''))) {
+        showModal('รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง (ต้องเป็นตัวเลข 10-12 หลัก)', 'ข้อมูลไม่ถูกต้อง');
+        return;
+      }
+
+      // Validate citizen ID format (13 digits if provided)
+      if (citizenID && !/^[0-9]{13}$/.test(citizenID)) {
+        showModal('หมายเลขประจำตัวประชาชนต้องเป็นตัวเลข 13 หลัก', 'ข้อมูลไม่ถูกต้อง');
+        return;
+      }
+
+      // Compile all form data into an object to send to Apps Script
+      const formData = {
+        'reporterName': reporterName, // ใช้ชื่อ key ที่ตรงกับ submitNewRepair ใน Code.gs
+        'phoneNumber': phoneNumber,
+        'location': location,
+        'department': document.getElementById('department').value.trim(),
+        'citizenID': citizenID,
+        'repairType': repairType.value,
+        'repairDesc': repairDesc,
+        'photoUrl': '', // This will be populated by the uploaded URL in Code.gs if base64PhotoData exists
+        'base64PhotoData': selectedImageBase64, // Base64 data for image upload
+        'photoFileName': selectedImageFileName, // File name for image upload
+        'geoStamp': geoStamp,   // Manually entered GeoStamp
+        'geoCode': geoCode,     // Manually entered GeoCode
+        'geoAddress': geoAddress, // Manually entered GeoAddress
+        'status': 'แจ้งซ่อมแล้ว', // Default status for new repair requests
+        'assignee': '' // Default empty assignee
+      };
+
+      // Disable submit button and show loading indicator
+      submitBtn.disabled = true;
+      showLoading('กำลังส่งแจ้งซ่อม...');
+
+      try {
+        // Ensure google.script.run is available
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          throw new Error('Google Apps Script environment is not ready. Please refresh the page or check deployment.');
+        }
+
+        // --- IMPORTANT CHANGE HERE: Calling submitNewRepair instead of submitRepairForm ---
+        google.script.run
+          .withSuccessHandler(() => {
+            hideLoading();
+            submitBtn.disabled = false;
+            showModal('แจ้งซ่อมสำเร็จ!', 'สำเร็จ').then(() => {
+              form.reset(); // Clear all form fields
+              clearPhotoSelection(); // Clear photo preview
+              loadStatus(); // Redirect to status page after successful submission
+            });
+          })
+          .withFailureHandler(e => {
+            hideLoading();
+            submitBtn.disabled = false;
+            showModal('เกิดข้อผิดพลาดในการแจ้งซ่อม: ' + e.message, 'ข้อผิดพลาด');
+            debugLog('Submission failed: ' + e.message);
+          })
+          .submitNewRepair(formData); // <--- THIS IS THE FIX: Call submitNewRepair
+          
+      } catch (error) {
+        hideLoading();
+        submitBtn.disabled = false;
+        showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
+        debugLog('Error in submitRepair: ' + error.message);
+      }
+    }
+
+    // --- Page Initialization ---
+
+    // Event listener for when the DOM is fully loaded.
+    document.addEventListener('DOMContentLoaded', function() {
+      debugLog('Report repair page loaded, initializing...');
+      
+      let attempts = 0;
+      const maxAttempts = 10; // Max attempts to check for google.script.run availability
+      
+      /**
+       * Recursively checks if google.script.run is available.
+       */
+      function checkGoogleScript() {
+        attempts++;
+        debugLog('Checking Google Apps Script availability, attempt: ' + attempts);
+        
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          debugLog('Google Apps Script is ready for report repair page.');
+          // Any initial setup specific to this page can go here if needed.
+        } else if (attempts < maxAttempts) {
+          debugLog('Google Apps Script not ready yet, retrying in 500ms...');
+          setTimeout(checkGoogleScript, 500); // Retry after 500ms
+        } else {
+          debugLog('Google Apps Script failed to load after ' + maxAttempts + ' attempts for report repair page.');
+          showModal('ระบบไม่สามารถโหลด Google Apps Script ได้<br><br>กรุณา:<br>1. ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต<br>2. ปิด Ad Blocker (ถ้ามี)<br>3. รีเฟรชหน้าเว็บ', 'ไม่สามารถโหลดระบบได้');
+        }
+      }
+      
+      checkGoogleScript(); // Start checking on page load
+    });
+
+    // Global error handler to catch uncaught JavaScript errors.
+    window.addEventListener('error', function(e) {
+      debugLog('Global error on report repair page: ' + (e.error?.message || e.message));
+      console.error('Global error on report repair page:', e);
+    });
+  </script>
+
+</body>
+</html>

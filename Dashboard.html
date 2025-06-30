@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
+  <style>
+    /* Global styles and overrides for body and general layout */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(135deg,#8A2BE2,#D291BC);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #333;
+    }
+    /* Top Navbar */
+    .topnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1976D2;
+      padding: 0 1.5rem;
+      height: 60px;
+      color: #fff;
+    }
+    .topnav .left {
+      display: flex;
+      align-items: center;
+    }
+    .topnav .left i {
+      font-size: 1.5rem;
+      margin-right: 0.8rem;
+    }
+    .topnav .left .title {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .topnav .right {
+      display: flex;
+      align-items: center;
+    }
+    .topnav .right a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 0.8rem;
+      font-weight: 500;
+      position: relative;
+      padding: 0.3rem 0.4rem;
+      transition: background .2s;
+      cursor: pointer;
+    }
+    .topnav .right a:hover {
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+    }
+    /* user menu - existing styles */
+    .user-menu {
+      position: relative;
+      display: flex; /* Ensure flex for alignment of new elements */
+      align-items: center; /* Align items vertically */
+      gap: 0.5rem; /* Space between image and text */
+      margin-left: 0.8rem; /* Add some margin to separate from navigation links */
+    }
+    .user-menu img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    /* Styles for the new user info display */
+    .user-info-display {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* Align text to the left within its container */
+      color: #e0f7fa; /* Light blue text for visibility on dark background */
+      font-size: 0.95rem;
+      line-height: 1.2; /* Adjust line height for better spacing */
+    }
+    .user-info-display .username {
+      font-weight: 600;
+      color: #fff; /* Keep username white */
+    }
+    .user-info-display .position {
+      font-size: 0.8em; /* Slightly smaller for position */
+      color: #b3e0ff; /* Lighter blue for position */
+    }
+
+    /* user dropdown - existing styles */
+    .user-menu .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 44px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      min-width: 140px;
+      z-index: 1000;
+    }
+    .user-menu .dropdown a {
+      display: block;
+      padding: 0.6rem 1rem;
+      color: #333;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: background .2s;
+    }
+    .user-menu .dropdown a:hover {
+      background: #f1f1f1;
+    }
+    /* Keep dropdown visible on hover over entire user-menu */
+    .user-menu:hover .dropdown {
+      display: block;
+    }
+
+    /* Main Content */
+    .main {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: #fff;
+    }
+    .main h2 {
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      color: #fff;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+    .main p {
+      font-size: 1.1rem;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1000px;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      padding: 1.5rem;
+      text-align: center;
+      flex: 1 1 calc(25% - 1.5rem);
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.8rem;
+    }
+    .card .title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 0.5rem;
+    }
+    .card .value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #333;
+    }
+    .card.total .icon { color: #1976D2; }
+    .card.total .value { color: #1976D2; }
+    .card.reported .icon { color: #FF9800; }
+    .card.reported .value { color: #FF9800; }
+    .card.inProgress .icon { color: #2196F3; }
+    .card.inProgress .value { color: #2196F3; }
+    .card.completed .icon { color: #4CAF50; }
+    .card.completed .value { color: #4CAF50; }
+    .card.cancelled .icon { color: #F44336; }
+    .card.cancelled .value { color: #F44336; }
+
+    /* Chart Placeholder */
+    .chart-section {
+      background: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 1000px;
+      margin-bottom: 2rem;
+      text-align: left;
+      color: #333;
+    }
+    .chart-section h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #555;
+    }
+    .chart-placeholder {
+      background: #e0e0e0;
+      height: 250px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #777;
+      font-style: italic;
+      font-size: 1.1rem;
+    }
+
+    /* Loading และ Modal styles */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .loading-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: center;
+      color: #333;
+    }
+    .loading-spinner {
+      border: 4px solid rgba(90, 74, 225, 0.3);
+      border-top: 4px solid #5A4AE1;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+    }
+    .modal-content h3 {
+      margin-top: 0;
+      color: #5A4AE1;
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+    }
+    .modal-content p {
+      color: #444;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .modal-close-button {
+      background: #5A4AE1;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modal-close-button:hover {
+      background: #4738BE;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .topnav {
+        flex-direction: column;
+        height: auto;
+        padding: 0.8rem 1rem;
+        gap: 0.5rem;
+      }
+      .topnav .left, .topnav .right {
+        width: 100%;
+        justify-content: center;
+      }
+      .topnav .right {
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-top: 0.5rem;
+      }
+      /* Adjust user-menu for small screens */
+      .user-menu {
+        margin-top: 0.5rem; /* Give some space from nav links */
+        margin-left: 0; /* Remove left margin */
+        justify-content: center; /* Center horizontally */
+        width: 100%; /* Take full width */
+      }
+      .main {
+        padding: 1rem;
+      }
+      .main h2 {
+        font-size: 1.8rem;
+      }
+      .main p {
+        font-size: 1rem;
+      }
+      .dashboard-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+      .card {
+        flex: 1 1 100%;
+        max-width: 400px;
+      }
+      .chart-section {
+        padding: 1rem;
+      }
+      .chart-section h3 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="topnav">
+    <div class="left">
+      <i class="fas fa-bolt"></i>
+      <div class="title">ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</div>
+    </div>
+    <div class="right">
+      <a onclick="loadDashboard()"><i class="fas fa-home"></i> หน้าหลัก</a>
+      <a onclick="loadReportRepair()"><i class="fas fa-plus-circle"></i> แจ้งซ่อมใหม่</a>
+      <a onclick="loadStatus()"><i class="fas fa-tools"></i> จัดการแจ้งซ่อม</a>
+      <a href="#"><i class="fas fa-chart-bar"></i> รายงาน</a>
+      <div class="user-menu">
+        <img src="https://placehold.co/32x32/cccccc/000000?text=User" alt="User">
+        <!-- START: Added/Modified User Profile Display -->
+        <div class="user-info-display">
+            <span class="username" id="loggedInUsername">ผู้ใช้งาน</span>
+            <div class="position" id="loggedInUserPosition">ตำแหน่ง</div>
+        </div>
+        <!-- END: Added/Modified User Profile Display -->
+        <div class="dropdown">
+          <a href="#"><i class="fas fa-cog"></i> ตั้งค่า</a>
+          <a onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main">
+    <h2>ภาพรวมสถานะการแจ้งซ่อม</h2>
+    <p>ดูข้อมูลสรุปและสถานะล่าสุดของการแจ้งซ่อมทั้งหมด</p>
+
+    <div class="dashboard-cards" id="dashboard-cards">
+      <div class="card total">
+        <div class="icon"><i class="fas fa-clipboard-list"></i></div>
+        <div class="title">แจ้งซ่อมทั้งหมด</div>
+        <div class="value" id="total-repairs">0</div>
+      </div>
+      <div class="card reported">
+        <div class="icon"><i class="fas fa-exclamation-circle"></i></div>
+        <div class="title">แจ้งซ่อมแล้ว</div>
+        <div class="value" id="reported-repairs">0</div>
+      </div>
+      <div class="card inProgress">
+        <div class="icon"><i class="fas fa-tools"></i></div>
+        <div class="title">กำลังดำเนินการ</div>
+        <div class="value" id="inProgress-repairs">0</div>
+      </div>
+      <div class="card completed">
+        <div class="icon"><i class="fas fa-check-circle"></i></div>
+        <div class="title">เสร็จเรียบร้อย</div>
+        <div class="value" id="completed-repairs">0</div>
+      </div>
+      <div class="card cancelled">
+        <div class="icon"><i class="fas fa-times-circle"></i></div>
+        <div class="title">ยกเลิก</div>
+        <div class="value" id="cancelled-repairs">0</div>
+      </div>
+    </div>
+
+    <div class="chart-section">
+      <h3>สถิติการแจ้งซ่อม (กราฟจำลอง)</h3>
+      <div class="chart-placeholder">
+        กราฟจะแสดงที่นี่ (อาจใช้ Chart.js ในอนาคต)
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p id="loading-message">กำลังโหลดข้อมูล...</p>
+    </div>
+  </div>
+
+  <!-- Custom Modal -->
+  <div id="custom-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 id="modal-title">แจ้งเตือน</h3>
+      <p id="modal-message"></p>
+      <button class="modal-close-button" onclick="hideModal()">ตกลง</button>
+    </div>
+  </div>
+
+  <script>
+    // Debug function (ซ่อนอยู่ใน console)
+    function debugLog(message) {
+      console.log('🔧 DEBUG:', message);
+    }
+
+    // Modal functions
+    function showModal(message, title = 'แจ้งเตือน') {
+      return new Promise(resolve => {
+        const modal = document.getElementById('custom-modal');
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-message').innerHTML = message;
+        modal.style.display = 'flex';
+        document.querySelector('.modal-close-button').onclick = () => {
+          hideModal();
+          resolve();
+        };
+      });
+    }
+
+    function hideModal() {
+      document.getElementById('custom-modal').style.display = 'none';
+    }
+
+    function showLoading(message = 'กำลังโหลดข้อมูล...') {
+      document.getElementById('loading-message').textContent = message;
+      document.getElementById('loading-overlay').style.display = 'flex';
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-overlay').style.display = 'none';
+    }
+
+    // Navigation functions
+    function loadDashboard() {
+      debugLog('loadDashboard called');
+      location.reload();
+    }
+
+    function loadReportRepair() {
+      debugLog('loadReportRepair called');
+      
+      try {
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          throw new Error('Google Apps Script ไม่พร้อมใช้งาน');
+        }
+        
+        showLoading('กำลังโหลดหน้าแจ้งซ่อม...');
+        
+        google.script.run
+          .withSuccessHandler(html => { 
+            debugLog('Report repair page loaded successfully');
+            hideLoading();
+            document.open(); 
+            document.write(html); 
+            document.close(); 
+          })
+          .withFailureHandler(e => { 
+            debugLog('Report repair page error: ' + e.message);
+            hideLoading();
+            showModal('เกิดข้อผิดพลาด: ' + e.message, 'ไม่สามารถโหลดหน้าแจ้งซ่อมได้').then(() => {
+              google.script.run.withSuccessHandler(html => { 
+                document.open(); 
+                document.write(html); 
+                document.close(); 
+              }).getLoginPage(); 
+            });
+          })
+          .getReportRepairPage();
+          
+      } catch (error) {
+        debugLog('Navigation error: ' + error.message);
+        hideLoading();
+        showModal('เกิดข้อผิดพลาด: ' + error.message + '<br><br>กรุณาลองรีเฟรชหน้าเว็บ', 'ข้อผิดพลาด');
+      }
+    }
+
+    function loadStatus() {
+      debugLog('loadStatus called');
+      
+      try {
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          throw new Error('Google Apps Script ไม่พร้อมใช้งาน');
+        }
+        
+        showLoading('กำลังโหลดหน้าจัดการแจ้งซ่อม...');
+        
+        google.script.run
+          .withSuccessHandler(html => { 
+            debugLog('Status page loaded successfully');
+            hideLoading();
+            document.open(); 
+            document.write(html); 
+            document.close(); 
+          })
+          .withFailureHandler(e => { 
+            debugLog('Status page error: ' + e.message);
+            hideLoading();
+            showModal('เกิดข้อผิดพลาด: ' + e.message, 'ไม่สามารถโหลดหน้าจัดการได้').then(() => {
+              google.script.run.withSuccessHandler(html => { 
+                document.open(); 
+                document.write(html); 
+                document.close(); 
+              }).getLoginPage(); 
+            });
+          })
+          .getStatusPage();
+          
+      } catch (error) {
+        debugLog('Navigation error: ' + error.message);
+        hideLoading();
+        showModal('เกิดข้อผิดพลาด: ' + error.message + '<br><br>กรุณาลองรีเฟรชหน้าเว็บ', 'ข้อผิดพลาด');
+      }
+    }
+
+    function logout() {
+      debugLog('logout called');
+      
+      showModal('คุณต้องการออกจากระบบหรือไม่?', 'ยืนยันการออกจากระบบ').then(() => {
+        try {
+          if (typeof google === 'undefined' || !google.script || !google.script.run) {
+            throw new Error('Google Apps Script ไม่พร้อมใช้งาน');
+          }
+          
+          showLoading('กำลังออกจากระบบ...');
+          
+          google.script.run
+            .withSuccessHandler(html => { 
+              debugLog('Logout successful');
+              hideLoading();
+              document.open(); 
+              document.write(html); 
+              document.close(); 
+            })
+            .withFailureHandler(e => { 
+              debugLog('Logout error: ' + e.message);
+              hideLoading();
+              showModal('เกิดข้อผิดพลาดในการออกจากระบบ: ' + e.message, 'ข้อผิดพลาด');
+            })
+            .doLogout();
+            
+        } catch (error) {
+          debugLog('Logout navigation error: ' + error.message);
+          hideLoading();
+          showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
+        }
+      });
+    }
+
+    // Dashboard data loading
+    function loadDashboardSummary() {
+      debugLog('loadDashboardSummary called');
+      
+      try {
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          debugLog('Google Apps Script not available');
+          showModal('ระบบไม่สามารถเชื่อมต่อได้<br><br>กรุณา:<br>1. ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต<br>2. รีเฟรชหน้าเว็บ<br>3. ลองเข้าใหม่อีกครั้ง', 'ไม่สามารถเชื่อมต่อได้');
+          return;
+        }
+        
+        showLoading('กำลังโหลดข้อมูลสรุป...');
+        
+        google.script.run
+          .withSuccessHandler(data => {
+            debugLog('Dashboard data loaded: ' + JSON.stringify(data));
+            hideLoading();
+            
+            document.getElementById('total-repairs').textContent = data.total || 0;
+            document.getElementById('reported-repairs').textContent = data.reported || 0;
+            document.getElementById('inProgress-repairs').textContent = data.inProgress || 0;
+            document.getElementById('completed-repairs').textContent = data.completed || 0;
+            document.getElementById('cancelled-repairs').textContent = data.cancelled || 0;
+            
+            // แสดงข้อความถ้าไม่มีข้อมูล
+            if (data.total === 0) {
+              setTimeout(() => {
+                showModal('ยังไม่มีข้อมูลการแจ้งซ่อมในระบบ<br><br><small>เริ่มต้นใช้งานโดยการคลิก "แจ้งซ่อมใหม่"</small>', 'ยินดีต้อนรับ');
+              }, 500);
+            }
+          })
+          .withFailureHandler(e => {
+            debugLog('Dashboard data error: ' + e.message);
+            hideLoading();
+            console.error('Dashboard summary error:', e);
+            showModal('เกิดข้อผิดพลาดในการดึงข้อมูลสรุป<br><br>อาจเป็นเพราะ:<br>1. Session หมดอายุ<br>2. ไม่มีสิทธิ์เข้าถึง<br><br>กำลังพาไปหน้าเข้าสู่ระบบ...', 'ข้อผิดพลาด').then(() => {
+              google.script.run.withSuccessHandler(html => {
+                document.open(); 
+                document.write(html); 
+                document.close();
+              }).getLoginPage();
+            });
+          })
+          .getDashboardSummary();
+          
+      } catch (error) {
+        debugLog('Dashboard summary initialization error: ' + error.message);
+        hideLoading();
+        showModal('เกิดข้อผิดพลาดในการเริ่มต้นระบบ: ' + error.message, 'ข้อผิดพลาด');
+      }
+    }
+
+    /**
+     * Fetches the logged-in user's details and displays them.
+     */
+    function fetchAndDisplayUserDetails() {
+        debugLog('fetchAndDisplayUserDetails called');
+        try {
+            // Check if google.script.run is available
+            if (typeof google === 'undefined' || !google.script || !google.script.run) {
+                debugLog('Google Apps Script not ready, cannot fetch user details.');
+                return;
+            }
+
+            google.script.run
+                .withSuccessHandler(userDetails => {
+                    if (userDetails) {
+                        // Update the text content of the elements
+                        document.getElementById('loggedInUsername').textContent = userDetails.username || 'ผู้ใช้งาน';
+                        document.getElementById('loggedInUserPosition').textContent = userDetails.position || 'ไม่ระบุตำแหน่ง';
+                        debugLog('User details displayed: ' + JSON.stringify(userDetails));
+                    } else {
+                        // Handle case where user is not logged in or details are missing
+                        document.getElementById('loggedInUsername').textContent = 'ไม่ได้เข้าสู่ระบบ';
+                        document.getElementById('loggedInUserPosition').textContent = '';
+                        debugLog('No user logged in or details not found.');
+                    }
+                })
+                .withFailureHandler(e => {
+                    // Log error and set placeholder text
+                    console.error('Failed to fetch user details:', e.message);
+                    document.getElementById('loggedInUsername').textContent = 'เกิดข้อผิดพลาด';
+                    document.getElementById('loggedInUserPosition').textContent = '';
+                })
+                .getLoggedInUserDetails(); // Call the Apps Script function
+        } catch (error) {
+            console.error('Error in fetchAndDisplayUserDetails:', error.message);
+        }
+    }
+
+    // Auto-load dashboard data and user details when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      debugLog('Dashboard page loaded, initializing...');
+      
+      // ตรวจสอบว่า Google Apps Script พร้อมใช้งานหรือไม่
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      function checkGoogleScript() {
+        attempts++;
+        debugLog('Checking Google Apps Script availability, attempt: ' + attempts);
+        
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          debugLog('Google Apps Script is ready');
+          setTimeout(loadDashboardSummary, 800);
+          fetchAndDisplayUserDetails(); // Call to fetch and display user details
+        } else if (attempts < maxAttempts) {
+          debugLog('Google Apps Script not ready yet, retrying...');
+          setTimeout(checkGoogleScript, 500);
+        } else {
+          debugLog('Google Apps Script failed to load after ' + maxAttempts + ' attempts');
+          showModal('ระบบไม่สามารถโหลด Google Apps Script ได้<br><br>กรุณา:<br>1. ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต<br>2. ปิด Ad Blocker (ถ้ามี)<br>3. รีเฟรชหน้าเว็บ', 'ไม่สามารถโหลดระบบได้');
+        }
+      }
+      
+      checkGoogleScript();
+    });
+
+    // Global error handler
+    window.addEventListener('error', function(e) {
+      debugLog('Global error: ' + (e.error?.message || e.message));
+      console.error('Global error:', e);
+    });
+  </script>
+
+</body>
+</html>

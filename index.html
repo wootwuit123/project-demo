@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>เข้าสู่ระบบ</title>
+  <?!= include('style') ?>
+</head>
+<body>
+  <div class="container">
+    <!-- โลโก้ -->
+    <div class="logo"></div>
+
+    <!-- หัวเรื่อง -->
+    <h1>เข้าสู่ระบบ</h1>
+    <p class="subtitle">
+      ระบบแจ้งซ่อมออนไลน์<br>
+      เทศบาลตำบลอุดมธัญญา
+    </p>
+
+    <!-- ฟอร์มล็อกอิน -->
+    <form id="login-form">
+      <input 
+        type="text" 
+        id="username" 
+        name="username" 
+        placeholder="ชื่อผู้ใช้"
+        autocomplete="username">
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        placeholder="รหัสผ่าน"
+        autocomplete="current-password">
+      <button type="button" onclick="validateLogin()" id="login-btn">
+        เข้าสู่ระบบ
+      </button>
+    </form>
+
+    <!-- ลิงก์ไปหน้า Register -->
+    <p class="login-link">
+      ยังไม่มีบัญชี? 
+      <a href="#" onclick="loadRegistration()">สมัครสมาชิก</a>
+    </p>
+  </div>
+
+  <!-- ✅ เพิ่ม: Loading spinner -->
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>กำลังเข้าสู่ระบบ...</p>
+    </div>
+  </div>
+
+  <!-- ✅ เพิ่ม: Custom Modal -->
+  <div id="custom-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 id="modal-title">แจ้งเตือน</h3>
+      <p id="modal-message"></p>
+      <button class="modal-close-button" onclick="hideModal()">ตกลง</button>
+    </div>
+  </div>
+
+  <script>
+    // ✅ เพิ่ม: Enhanced modal functions
+    function showModal(message, title = 'แจ้งเตือน') {
+      return new Promise(resolve => {
+        const modal = document.getElementById('custom-modal');
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-message').innerHTML = message;
+        modal.style.display = 'flex';
+        document.querySelector('.modal-close-button').onclick = () => {
+          hideModal();
+          resolve();
+        };
+      });
+    }
+
+    function hideModal() {
+      document.getElementById('custom-modal').style.display = 'none';
+    }
+
+    function showLoading() {
+      document.getElementById('loading-overlay').style.display = 'flex';
+      document.getElementById('login-btn').disabled = true;
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-overlay').style.display = 'none';
+      document.getElementById('login-btn').disabled = false;
+    }
+
+    // ✅ แก้ไข: Enhanced login validation
+    function validateLogin() {
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
+      
+      if (!u || !p) {
+        showModal('กรุณากรอก ชื่อผู้ใช้ และ รหัสผ่าน', 'ข้อมูลไม่ครบถ้วน');
+        return;
+      }
+
+      // ✅ เพิ่ม: Basic validation
+      if (u.length < 3) {
+        showModal('ชื่อผู้ใช้ต้องมีอย่างน้อย 3 ตัวอักษร', 'ข้อมูลไม่ถูกต้อง');
+        return;
+      }
+
+      if (p.length < 4) {
+        showModal('รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร', 'ข้อมูลไม่ถูกต้อง');
+        return;
+      }
+
+      showLoading();
+
+      google.script.run
+        .withFailureHandler(error => {
+          hideLoading();
+          console.error('Login error:', error);
+          showModal(error.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ', 'เข้าสู่ระบบไม่สำเร็จ');
+        })
+        .withSuccessHandler(success => {
+          hideLoading();
+          if (success) {
+            showModal('เข้าสู่ระบบสำเร็จ!', 'สำเร็จ').then(() => {
+              google.script.run.withSuccessHandler(html => {
+                document.open();
+                document.write(html);
+                document.close();
+              }).withFailureHandler(error => {
+                showModal('เกิดข้อผิดพลาดในการโหลดหน้าหลัก: ' + error.message);
+              }).getMenuPage();
+            });
+          } else {
+            showModal('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'เข้าสู่ระบบไม่สำเร็จ');
+          }
+        })
+        .checkLogin(u, p);
+    }
+
+    function loadRegistration() {
+      google.script.run.withSuccessHandler(html => {
+        document.open();
+        document.write(html);
+        document.close();
+      }).withFailureHandler(error => {
+        showModal('เกิดข้อผิดพลาดในการโหลดหน้าสมัครสมาชิก: ' + error.message);
+      }).getRegistrationPage();
+    }
+
+    // ✅ เพิ่ม: Enter key support
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('username').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('password').focus();
+        }
+      });
+      
+      document.getElementById('password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          validateLogin();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

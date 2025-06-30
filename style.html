@@ -1,0 +1,768 @@
+<style>
+  /* ✅ แก้ไข: Enhanced Base styles for the entire app */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #8A2BE2, #D291BC); /* Gradient background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Prompt', sans-serif; /* Thai font */
+    color: #333; /* Default text color */
+    line-height: 1.6;
+  }
+
+  /* ✅ เพิ่ม: Import Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+
+  /* ✅ แก้ไข: Enhanced Container for forms (login, registration, report repair) */
+  .container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    max-width: 600px; /* Increased max-width for report_repair form */
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    margin: 20px; /* Add some margin for smaller screens */
+    animation: fadeInUp 0.5s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    background: url('https://img2.pic.in.th/pic/2664c9eaf49cd888a22f272df401c334.jpeg') no-repeat center/contain;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  h1 {
+    margin: 0 0 .25rem;
+    color: #5A4AE1;
+    font-size: 2rem; /* Larger heading */
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .subtitle {
+    margin: 0 0 1.5rem;
+    color: #666;
+    font-size: 1.1rem; /* Larger subtitle */
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  /* ✅ แก้ไข: Enhanced Form Elements */
+  form input,
+  form button,
+  form textarea,
+  form select {
+    width: 100%;
+    padding: .85rem; /* More padding */
+    margin-top: 1rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-family: 'Prompt', sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  form input:focus,
+  form textarea:focus,
+  form select:focus {
+    outline: none;
+    border-color: #5A4AE1;
+    box-shadow: 0 0 0 3px rgba(90, 74, 225, 0.2); /* Focus glow */
+    transform: translateY(-1px);
+  }
+
+  form input::placeholder,
+  form textarea::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  /* ✅ เพิ่ม: Input validation states */
+  form input.error,
+  form textarea.error {
+    border-color: #e74c3c;
+    background-color: #fdf2f2;
+  }
+
+  form input.success,
+  form textarea.success {
+    border-color: #27ae60;
+    background-color: #f2fdf5;
+  }
+
+  form button {
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, #5A4AE1, #7B68EE);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all .3s ease;
+    font-weight: 500;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  form button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #4738BE, #6A5ACD);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(90, 74, 225, 0.3);
+  }
+
+  form button:active {
+    transform: translateY(0);
+  }
+
+  form button:disabled {
+    background: #a0a0a0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ✅ เพิ่ม: Button loading state */
+  form button.loading {
+    pointer-events: none;
+  }
+
+  form button.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    right: 15px;
+    margin-top: -10px;
+    border: 2px solid transparent;
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: button-loading-spinner 1s ease infinite;
+  }
+
+  @keyframes button-loading-spinner {
+    from {
+      transform: rotate(0turn);
+    }
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  /* ✅ แก้ไข: Enhanced Link Styles */
+  .login-link {
+    margin-top: 1.5rem;
+    font-size: .95rem;
+    color: #888;
+  }
+
+  .login-link a {
+    color: #5A4AE1;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .login-link a:hover {
+    color: #4738BE;
+    text-decoration: underline;
+  }
+
+  .login-link a::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #5A4AE1;
+    transition: width 0.3s ease;
+  }
+
+  .login-link a:hover::before {
+    width: 100%;
+  }
+
+  /* ✅ แก้ไข: Enhanced Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: modalFadeIn 0.3s ease-out;
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    position: relative;
+    animation: modalSlideIn 0.3s ease-out;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-50px) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .modal-content h3 {
+    margin-top: 0;
+    color: #5A4AE1;
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+  }
+
+  .modal-content p {
+    color: #444;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+
+  .modal-close-button {
+    background: linear-gradient(135deg, #5A4AE1, #7B68EE);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    min-width: 100px;
+  }
+
+  .modal-close-button:hover {
+    background: linear-gradient(135deg, #4738BE, #6A5ACD);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(90, 74, 225, 0.3);
+  }
+
+  /* ✅ เพิ่ม: Enhanced Loading Spinner */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: modalFadeIn 0.3s ease-out;
+  }
+
+  .loading-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    color: #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    min-width: 200px;
+  }
+
+  .loading-spinner {
+    border: 4px solid rgba(90, 74, 225, 0.3);
+    border-top: 4px solid #5A4AE1;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .loading-content p {
+    margin: 0;
+    font-size: 1rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+  /* ✅ เพิ่ม: Form Groups for better organization */
+  .form-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+    font-size: 0.95rem;
+  }
+
+  .form-group label .required {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-left: 2px;
+  }
+
+  .form-group .help-text {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    margin-top: 0;
+  }
+
+  /* ✅ เพิ่ม: Radio Button Enhancements */
+  .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .radio-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal;
+    color: #333;
+    margin-bottom: 0;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+
+  .radio-group label:hover {
+    background-color: #f8f9fa;
+  }
+
+  .radio-group input[type="radio"] {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    outline: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .radio-group input[type="radio"]:checked {
+    border-color: #5A4AE1;
+    background-color: #5A4AE1;
+    box-shadow: 0 0 0 3px rgba(90, 74, 225, 0.2);
+  }
+
+  .radio-group input[type="radio"]:checked::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .radio-group input[type="radio"]:checked + label {
+    background-color: rgba(90, 74, 225, 0.1);
+    border-radius: 8px;
+  }
+
+  /* ✅ เพิ่ม: Button Groups */
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .button-group button {
+    flex: 1;
+    min-width: 120px;
+    margin-top: 0;
+  }
+
+  .button-group button.primary {
+    background: linear-gradient(135deg, #5A4AE1, #7B68EE);
+    color: #fff;
+  }
+
+  .button-group button.secondary {
+    background: linear-gradient(135deg, #6c757d, #868e96);
+    color: #fff;
+  }
+
+  .button-group button.success {
+    background: linear-gradient(135deg, #28a745, #34ce57);
+    color: #fff;
+  }
+
+  .button-group button.danger {
+    background: linear-gradient(135deg, #dc3545, #e74c3c);
+    color: #fff;
+  }
+
+  /* ✅ เพิ่ม: Special Button Styles */
+  .ai-button {
+    background: linear-gradient(135deg, #4CAF50, #66BB6A) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.75rem 1.25rem !important;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem !important;
+    margin-top: 1rem !important;
+    cursor: pointer;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    width: auto !important;
+    font-weight: 500;
+  }
+
+  .ai-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #45a049, #5cb85c) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+  }
+
+  .ai-button:disabled {
+    background: linear-gradient(135deg, #a0a0a0, #b0b0b0) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .ai-button i {
+    margin-right: 8px;
+  }
+
+  .gps-button {
+    background: linear-gradient(135deg, #2196F3, #42A5F5) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.6rem 1rem !important;
+    font-size: 0.9rem !important;
+    margin-top: 0.5rem !important;
+    cursor: pointer;
+    border-radius: 6px !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: auto !important;
+  }
+
+  .gps-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1976D2, #1E88E5) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+  }
+
+  .gps-button:disabled {
+    background: linear-gradient(135deg, #a0a0a0, #b0b0b0) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .gps-button i {
+    margin-right: 6px;
+  }
+
+  /* ✅ เพิ่ม: Utility Classes */
+  .text-center { text-align: center; }
+  .text-left { text-align: left; }
+  .text-right { text-align: right; }
+
+  .mt-1 { margin-top: 0.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mt-3 { margin-top: 1.5rem; }
+
+  .mb-1 { margin-bottom: 0.5rem; }
+  .mb-2 { margin-bottom: 1rem; }
+  .mb-3 { margin-bottom: 1.5rem; }
+
+  .p-1 { padding: 0.5rem; }
+  .p-2 { padding: 1rem; }
+  .p-3 { padding: 1.5rem; }
+
+  .d-none { display: none; }
+  .d-block { display: block; }
+  .d-flex { display: flex; }
+
+  /* ✅ เพิ่ม: Color Classes */
+  .text-primary { color: #5A4AE1; }
+  .text-secondary { color: #6c757d; }
+  .text-success { color: #28a745; }
+  .text-danger { color: #dc3545; }
+  .text-warning { color: #ffc107; }
+  .text-info { color: #17a2b8; }
+  .text-muted { color: #6c757d; }
+
+  .bg-primary { background-color: #5A4AE1; }
+  .bg-secondary { background-color: #6c757d; }
+  .bg-success { background-color: #28a745; }
+  .bg-danger { background-color: #dc3545; }
+  .bg-warning { background-color: #ffc107; }
+  .bg-info { background-color: #17a2b8; }
+  .bg-light { background-color: #f8f9fa; }
+  .bg-dark { background-color: #343a40; }
+
+  /* ✅ Responsive Design Enhancements */
+  @media (max-width: 600px) {
+    .container {
+      padding: 1.5rem;
+      margin: 10px;
+      border-radius: 8px;
+    }
+    
+    h1 {
+      font-size: 1.6rem;
+    }
+    
+    .subtitle {
+      font-size: 0.95rem;
+    }
+    
+    form input,
+    form button,
+    form textarea,
+    form select {
+      padding: 0.75rem;
+      font-size: 0.95rem;
+    }
+    
+    .login-link {
+      font-size: 0.85rem;
+    }
+    
+    .modal-content {
+      padding: 1.5rem;
+      margin: 20px;
+    }
+    
+    .modal-content h3 {
+      font-size: 1.2rem;
+    }
+    
+    .modal-close-button {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+    }
+    
+    .button-group {
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    
+    .button-group button {
+      width: 100%;
+      flex: none;
+    }
+    
+    .radio-group {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .ai-button, 
+    .gps-button {
+      width: 100% !important;
+    }
+    
+    .form-group label {
+      font-size: 0.9rem;
+    }
+    
+    .form-group .help-text {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .container {
+      padding: 1rem;
+      margin: 5px;
+    }
+    
+    h1 {
+      font-size: 1.4rem;
+    }
+    
+    .logo {
+      width: 50px;
+      height: 50px;
+    }
+    
+    form input,
+    form button,
+    form textarea,
+    form select {
+      padding: 0.6rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  /* ✅ เพิ่ม: Print Styles */
+  @media print {
+    .modal-overlay,
+    .loading-overlay,
+    .ai-button,
+    .gps-button,
+    .button-group {
+      display: none !important;
+    }
+    
+    body {
+      background: white !important;
+      color: black !important;
+    }
+    
+    .container {
+      box-shadow: none !important;
+      border: 1px solid #ddd;
+    }
+  }
+
+  /* ✅ เพิ่ม: High Contrast Mode Support */
+  @media (prefers-contrast: high) {
+    .container {
+      border: 2px solid #000;
+    }
+    
+    form input,
+    form textarea,
+    form select {
+      border: 2px solid #000;
+    }
+    
+    form button {
+      border: 2px solid #000;
+    }
+  }
+
+  /* ✅ เพิ่ม: Reduced Motion Support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ✅ เพิ่ม: Dark Mode Support */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: linear-gradient(135deg, #2d1b69, #8b5a83);
+    }
+    
+    .container {
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+    
+    h1 {
+      color: #7B68EE;
+    }
+    
+    .subtitle {
+      color: #b0b0b0;
+    }
+    
+    form input,
+    form textarea,
+    form select {
+      background: #2d2d2d;
+      border-color: #555;
+      color: #e0e0e0;
+    }
+    
+    form input::placeholder,
+    form textarea::placeholder {
+      color: #888;
+    }
+    
+    .modal-content {
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+    
+    .loading-content {
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+  }
+</style>

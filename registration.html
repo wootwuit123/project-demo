@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>สมัครสมาชิก</title>
+  <?!= include('style') ?>
+</head>
+<body>
+  <div class="container">
+    <div class="logo"></div>
+    <h1>สมัครสมาชิก</h1>
+    <p class="subtitle">ระบบแจ้งซ่อมออนไลน์<br>เทศบาลตำบลอุดมธัญญา</p>
+
+    <form id="registration-form">
+      <input type="text" id="fullname" name="fullname" placeholder="ชื่อเต็ม *" required>
+      <input type="tel" id="phone" name="phone" placeholder="เบอร์โทร (10-12 หลัก) *" required>
+      <input type="email" id="email" name="email" placeholder="อีเมล (ไม่บังคับ)">
+      <input type="text" id="username" name="username" placeholder="ชื่อผู้ใช้ (อย่างน้อย 3 ตัวอักษร) *" required>
+      <input type="password" id="password" name="password" placeholder="รหัสผ่าน (อย่างน้อย 4 ตัวอักษร) *" required>
+      <input type="text" id="position" name="position" placeholder="ตำแหน่งงาน *" required>
+      <button type="button" onclick="registerUser()" id="register-btn">สมัครสมาชิก</button>
+    </form>
+
+    <p class="login-link">
+      มีบัญชีแล้ว? <a href="#" onclick="loadLogin()">เข้าสู่ระบบ</a>
+    </p>
+  </div>
+
+  <!-- ✅ เพิ่ม: Loading spinner -->
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>กำลังสมัครสมาชิก...</p>
+    </div>
+  </div>
+
+  <!-- ✅ เพิ่ม: Custom Modal -->
+  <div id="custom-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 id="modal-title">แจ้งเตือน</h3>
+      <p id="modal-message"></p>
+      <button class="modal-close-button" onclick="hideModal()">ตกลง</button>
+    </div>
+  </div>
+
+  <script>
+    // ✅ เพิ่ม: Enhanced modal functions
+    function showModal(message, title = 'แจ้งเตือน') {
+      return new Promise(resolve => {
+        const modal = document.getElementById('custom-modal');
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-message').innerHTML = message;
+        modal.style.display = 'flex';
+        document.querySelector('.modal-close-button').onclick = () => {
+          hideModal();
+          resolve();
+        };
+      });
+    }
+
+    function hideModal() {
+      document.getElementById('custom-modal').style.display = 'none';
+    }
+
+    function showLoading() {
+      document.getElementById('loading-overlay').style.display = 'flex';
+      document.getElementById('register-btn').disabled = true;
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-overlay').style.display = 'none';
+      document.getElementById('register-btn').disabled = false;
+    }
+
+    // ✅ แก้ไข: Enhanced registration with validation
+    function registerUser() {
+      const form = document.getElementById('registration-form');
+      const fullname = form.fullname.value.trim();
+      const phone = form.phone.value.trim();
+      const email = form.email.value.trim();
+      const username = form.username.value.trim();
+      const password = form.password.value.trim();
+      const position = form.position.value.trim();
+
+      // ✅ เพิ่ม: Client-side validation
+      const errors = [];
+
+      if (!fullname) errors.push('กรุณากรอกชื่อเต็ม');
+      if (!phone) errors.push('กรุณากรอกเบอร์โทร');
+      if (!username) errors.push('กรุณากรอกชื่อผู้ใช้');
+      if (!password) errors.push('กรุณากรอกรหัสผ่าน');
+      if (!position) errors.push('กรุณากรอกตำแหน่งงาน');
+
+      // Validate phone number format
+      if (phone && !/^[0-9]{10,12}$/.test(phone.replace(/[-\s]/g, ''))) {
+        errors.push('เบอร์โทรต้องเป็นตัวเลข 10-12 หลัก');
+      }
+
+      // Validate email format if provided
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errors.push('รูปแบบอีเมลไม่ถูกต้อง');
+      }
+
+      // Validate username length
+      if (username && username.length < 3) {
+        errors.push('ชื่อผู้ใช้ต้องมีอย่างน้อย 3 ตัวอักษร');
+      }
+
+      // Validate password length
+      if (password && password.length < 4) {
+        errors.push('รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร');
+      }
+
+      // Check for special characters in username
+      if (username && !/^[a-zA-Z0-9_]+$/.test(username)) {
+        errors.push('ชื่อผู้ใช้ควรประกอบด้วยตัวอักษรและตัวเลขเท่านั้น');
+      }
+
+      if (errors.length > 0) {
+        showModal(errors.join('<br>'), 'ข้อมูลไม่ถูกต้อง');
+        return;
+      }
+
+      showLoading();
+
+      google.script.run
+        .withFailureHandler(error => {
+          hideLoading();
+          console.error('Registration error:', error);
+          showModal(error.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก', 'สมัครสมาชิกไม่สำเร็จ');
+        })
+        .withSuccessHandler(success => {
+          hideLoading();
+          if (success) {
+            showModal('สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ', 'สำเร็จ').then(() => {
+              loadLogin();
+            });
+          } else {
+            showModal('เกิดข้อผิดพลาดในการสมัครสมาชิก', 'ไม่สำเร็จ');
+          }
+        })
+        .registerNewUser(fullname, phone, email, username, password, position);
+    }
+
+    function loadLogin() {
+      google.script.run.withSuccessHandler(html => {
+        document.open(); 
+        document.write(html); 
+        document.close();
+      }).withFailureHandler(error => {
+        showModal('เกิดข้อผิดพลาดในการโหลดหน้าเข้าสู่ระบบ: ' + error.message);
+      }).getLoginPage();
+    }
+
+    // ✅ เพิ่ม: Real-time validation feedback
+    document.addEventListener('DOMContentLoaded', function() {
+      const phoneInput = document.getElementById('phone');
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const emailInput = document.getElementById('email');
+
+      phoneInput.addEventListener('input', function() {
+        const phone = this.value.replace(/[-\s]/g, '');
+        if (phone && !/^[0-9]{10,12}$/.test(phone)) {
+          this.style.borderColor = '#e74c3c';
+        } else {
+          this.style.borderColor = '#ddd';
+        }
+      });
+
+      usernameInput.addEventListener('input', function() {
+        if (this.value && (this.value.length < 3 || !/^[a-zA-Z0-9_]+$/.test(this.value))) {
+          this.style.borderColor = '#e74c3c';
+        } else {
+          this.style.borderColor = '#ddd';
+        }
+      });
+
+      passwordInput.addEventListener('input', function() {
+        if (this.value && this.value.length < 4) {
+          this.style.borderColor = '#e74c3c';
+        } else {
+          this.style.borderColor = '#ddd';
+        }
+      });
+
+      emailInput.addEventListener('input', function() {
+        if (this.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value)) {
+          this.style.borderColor = '#e74c3c';
+        } else {
+          this.style.borderColor = '#ddd';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

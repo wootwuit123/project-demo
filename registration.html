@@ -14,7 +14,7 @@
     <form id="registration-form">
       <input type="text" id="fullname" name="fullname" placeholder="ชื่อเต็ม *" required>
       <input type="tel" id="phone" name="phone" placeholder="เบอร์โทร (10-12 หลัก) *" required>
-      <input type="email" id="email" name="email" placeholder="อีเมล (ไม่บังคับ)">
+      <input type="email" id="email" name="email" placeholder="อีเมล *" required>
       <input type="text" id="username" name="username" placeholder="ชื่อผู้ใช้ (อย่างน้อย 3 ตัวอักษร) *" required>
       <input type="password" id="password" name="password" placeholder="รหัสผ่าน (อย่างน้อย 4 ตัวอักษร) *" required>
       <input type="text" id="position" name="position" placeholder="ตำแหน่งงาน *" required>
@@ -87,6 +87,7 @@
 
       if (!fullname) errors.push('กรุณากรอกชื่อเต็ม');
       if (!phone) errors.push('กรุณากรอกเบอร์โทร');
+      if (!email) errors.push('กรุณากรอกอีเมล');
       if (!username) errors.push('กรุณากรอกชื่อผู้ใช้');
       if (!password) errors.push('กรุณากรอกรหัสผ่าน');
       if (!position) errors.push('กรุณากรอกตำแหน่งงาน');
@@ -96,7 +97,7 @@
         errors.push('เบอร์โทรต้องเป็นตัวเลข 10-12 หลัก');
       }
 
-      // Validate email format if provided
+      // Validate email format
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errors.push('รูปแบบอีเมลไม่ถูกต้อง');
       }

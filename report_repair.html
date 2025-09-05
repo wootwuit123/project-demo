@@ -4,264 +4,582 @@
   <meta charset="UTF-8">
   <title>แจ้งซ่อม - ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <?!= include('style'); ?>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
   <style>
-    /*
-      CSS styles for the report_repair.html page.
-      These styles are specific to this page or override default styles from 'style.html'.
-    */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background: linear-gradient(to bottom right, #e0f2f7, #c1e4f3); /* Soft blue gradient background */
-      color: #333;
-      display: block;
-      padding-top: 0;
+      font-family: 'Prompt', sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      display: flex;
       min-height: 100vh;
-      font-family: 'Inter', sans-serif; /* Using Inter font */
+      overflow-x: hidden;
     }
 
-    /* Top Navigation Bar */
-    .topnav {
+    /* Top Header Bar */
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background: #007bff; /* Primary blue color */
+      justify-content: space-between;
       padding: 0 1.5rem;
-      height: 60px; /* Slightly taller nav */
-      color: #fff;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 1001;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
-    .topnav .title {
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      color: #fff;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      margin-right: 1rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .menu-toggle:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-1px);
+    }
+
+    .header-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .header-icon {
+      margin-right: 0.8rem;
+      font-size: 1.4rem;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+
+    /* User Menu in Header */
+    .user-menu {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-left: 1rem;
+      padding: 0.4rem 1rem;
+      border-radius: 25px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+
+    .user-menu:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .user-menu img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.3);
+      transition: all 0.2s ease;
+    }
+
+    .user-menu:hover img {
+      transform: scale(1.05);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .user-info-display {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      color: #e3f2fd;
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+
+    .user-info-display .username {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .user-info-display .position {
+      font-size: 0.8rem;
+      color: #bbdefb;
+      opacity: 0.9;
+    }
+
+    .user-menu .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 8px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      overflow: hidden;
+      min-width: 180px;
+      z-index: 1002;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .user-menu .dropdown a {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      color: #2c3e50;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      gap: 0.8rem;
+    }
+
+    .user-menu .dropdown a:hover {
+      background: #f8f9fa;
+      color: #1976D2;
+      padding-left: 1.5rem;
+    }
+
+    .user-menu:hover .dropdown {
+      display: block;
+    }
+
+    /* Professional Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 60px;
+      left: -300px;
+      width: 300px;
+      height: calc(100vh - 60px);
+      background: linear-gradient(180deg, #34495e 0%, #2c3e50 100%);
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 3px solid #3498db;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      background: rgba(0,0,0,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+
+    .sidebar-header .logo {
+      font-size: 1.8rem;
+      color: #3498db;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-header .title {
+      color: #ecf0f1;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .sidebar-nav {
+      padding: 1rem 0;
+    }
+
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-section-title {
+      padding: 0.8rem 1.5rem 0.5rem;
+      color: #95a5a6;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      color: #bdc3c7;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .sidebar-nav a:hover {
+      background: rgba(52, 152, 219, 0.15);
+      border-left-color: #3498db;
+      color: #ecf0f1;
+      padding-left: 2rem;
+      transform: translateX(5px);
+    }
+
+    .sidebar-nav a.active {
+      background: linear-gradient(90deg, rgba(231, 76, 60, 0.2) 0%, rgba(231, 76, 60, 0.05) 100%);
+      border-left-color: #e74c3c;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .sidebar-nav a.active::after {
+      content: '';
+      position: absolute;
+      right: 1rem;
+      width: 8px;
+      height: 8px;
+      background: #e74c3c;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+    }
+
+    .sidebar-nav a i {
+      width: 24px;
+      margin-right: 1rem;
       font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .sidebar-nav a span {
+      flex-grow: 1;
+    }
+
+    /* Overlay */
+    .sidebar-overlay {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 60px);
+      background: rgba(0,0,0,0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 999;
+      backdrop-filter: blur(2px);
+    }
+
+    .sidebar-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Main Content */
+    .main-wrapper {
+      flex: 1;
+      margin-top: 60px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2.5rem;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f3f4;
+    }
+
+    .page-header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #1976D2;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .page-header .subtitle {
+      font-size: 1.2rem;
+      color: #546e7a;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Form Section Styling */
+    .form-section {
+      margin-bottom: 2.5rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 15px;
+      border: 1px solid #dee2e6;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .form-section-title {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #1976D2;
+    }
+
+    .form-section-title h2 {
+      color: #1976D2;
+      font-size: 1.5rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-    }
-    .topnav .menu {
-      display: flex;
-      gap: 1.5rem; /* Increased gap */
-    }
-    .topnav .menu a {
-      color: #e0f7fa; /* Lighter text for contrast */
-      text-decoration: none;
-      font-size: 1rem;
-      padding: 0.5rem 0.8rem;
-      border-radius: 8px; /* Rounded buttons */
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .topnav .menu a.active,
-    .topnav .menu a:hover {
-      background-color: rgba(255,255,255,0.15); /* Subtle hover/active effect */
-      transform: translateY(-2px); /* Slight lift on hover */
-      color: #fff;
+      gap: 0.8rem;
     }
 
-    /* Main Content Container */
-    .container {
-      max-width: 700px; /* Wider container */
-      margin: 2.5rem auto; /* More vertical margin */
-      padding: 2rem; /* More internal padding */
-      background: #ffffff;
-      border-radius: 16px; /* More rounded corners */
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15); /* Deeper shadow */
-      animation: fadeIn 0.8s ease-out; /* Fade-in animation */
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 0.8rem;
-      font-weight: 700; /* Bolder title */
-      font-size: 2.5rem; /* Larger title */
-      color: #0056b3; /* Darker blue for emphasis */
-    }
-
-    .subtitle {
-      margin: 0 0 2rem; /* More space below subtitle */
-      color: #666;
-      font-size: 1.15rem; /* Slightly larger subtitle */
-      line-height: 1.5;
-      text-align: center;
-      border-bottom: 1px solid #eee; /* Separator line */
-      padding-bottom: 1.5rem;
-    }
-
-    /* Form Group Styling */
+    /* Professional Form Group */
     .form-group {
-      margin-bottom: 1.5rem; /* Increased spacing between form groups */
+      margin-bottom: 1.8rem;
       text-align: left;
     }
+
     .form-group label {
       display: block;
-      margin-bottom: 0.6rem; /* More space below label */
-      font-weight: 600; /* Bolder label */
-      color: #444;
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+      color: #2c3e50;
       font-size: 1rem;
     }
+
     .form-group label .required {
-      color: #dc3545; /* Red for required fields */
+      color: #e74c3c;
       font-weight: bold;
+      margin-left: 0.2rem;
     }
+
     .form-group input[type="text"],
     .form-group input[type="tel"],
     .form-group textarea,
     .form-group select,
     .form-group input[type="file"] {
       width: 100%;
-      padding: 1rem 1.2rem; /* More padding for larger input fields */
-      border: 1px solid #cceeff; /* Lighter, subtle blue border */
-      border-radius: 10px; /* Softer rounded corners */
-      font-size: 1.05rem; /* Slightly larger text in inputs */
-      box-sizing: border-box;
-      background-color: #f8fcfd; /* Very light blue background */
-      transition: border-color 0.3s, box-shadow 0.3s;
+      padding: 1rem 1.3rem;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: 'Prompt', sans-serif;
+      background: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
+
     .form-group input:focus,
     .form-group textarea:focus,
     .form-group select:focus,
     .form-group input[type="file"]:focus {
       outline: none;
-      border-color: #007bff; /* Primary blue on focus */
-      box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25); /* Stronger focus glow */
-    }
-    .form-group .help-text {
-      font-size: 0.88rem; /* Slightly larger help text */
-      color: #777;
-      margin-top: 0.4rem;
-      padding-left: 0.2rem;
-    }
-    .form-group textarea {
-      resize: vertical;
-      min-height: 120px; /* Taller textarea */
+      border-color: #1976D2;
+      box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
+      transform: translateY(-1px);
     }
 
+    .form-group .help-text {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 0.5rem;
+      padding-left: 0.3rem;
+      font-style: italic;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* Professional Radio Group */
     .radio-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.2rem; /* More space between radio options */
-        margin-top: 0.8rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
     }
 
     .radio-group label {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        font-weight: normal;
-        color: #333;
-        margin-bottom: 0;
-        padding: 0.8rem 1.2rem; /* More padding */
-        border-radius: 10px; /* Rounded */
-        border: 1px solid #d0e8f2; /* Light border */
-        background-color: #eaf8ff; /* Lightest blue background */
-        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 500;
+      color: #2c3e50;
+      margin-bottom: 0;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      border: 2px solid #e1e5e9;
+      background: #fff;
+      transition: all 0.3s ease;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .radio-group label:hover {
-        background-color: #cceeff; /* Slightly darker blue on hover */
-        border-color: #007bff;
+      border-color: #1976D2;
+      background: #f3e5f5;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.15);
     }
 
-    /* Hide default radio input */
     .radio-group input[type="radio"] {
-        display: none;
+      display: none;
     }
 
-    /* Custom radio indicator */
+    .radio-group input[type="radio"] + span {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      width: 100%;
+    }
+
     .radio-group input[type="radio"] + span::before {
-        content: '';
-        display: inline-block;
-        width: 18px; /* Larger custom radio */
-        height: 18px;
-        border-radius: 50%;
-        border: 2px solid #007bff; /* Blue border */
-        margin-right: 10px;
-        vertical-align: middle;
-        transition: background-color 0.2s ease, border-color 0.2s ease;
+      content: '';
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #1976D2;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
     }
 
-    /* Checked state for custom radio */
     .radio-group input[type="radio"]:checked + span::before {
-        background-color: #007bff; /* Blue fill when checked */
-        border-color: #007bff;
-        box-shadow: inset 0 0 0 4px white; /* Inner white circle */
-    }
-    
-    .radio-group input[type="radio"]:checked + span {
-        font-weight: 600; /* Bolder text for checked item */
-        color: #0056b3;
-    }
-    .radio-group input[type="radio"]:checked + span::after {
-        content: '\2713'; /* Checkmark icon */
-        font-family: 'Font Awesome 6 Free'; /* Requires Font Awesome */
-        font-weight: 900;
-        position: absolute;
-        left: 17px; /* Adjust position */
-        color: white;
-        font-size: 12px;
-        top: 50%;
-        transform: translateY(-50%);
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      border-color: #1976D2;
+      box-shadow: inset 0 0 0 4px white;
     }
 
-    /* Button Group */
+    .radio-group input[type="radio"]:checked + span {
+      font-weight: 600;
+      color: #1976D2;
+    }
+
+    .radio-group input[type="radio"]:checked {
+      background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+      border-color: #1976D2;
+    }
+
+    .radio-group label:has(input[type="radio"]:checked) {
+      background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+      border-color: #1976D2;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.2);
+    }
+
+    /* File Upload Preview */
+    .file-upload-preview {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
+    }
+
+    .file-upload-preview img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #dee2e6;
+    }
+
+    .file-upload-preview button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .file-upload-preview button:hover {
+      background: #c82333;
+      transform: translateY(-1px);
+    }
+
+    /* Professional Button Group */
     .button-group {
       display: flex;
       gap: 1rem;
-      margin-top: 2rem; /* More space above buttons */
+      margin-top: 3rem;
+      justify-content: center;
     }
+
     .button-group button {
-      flex-grow: 1;
-      padding: 1rem 1.5rem; /* Larger padding for buttons */
-      font-size: 1.1rem; /* Larger button text */
-      border-radius: 10px; /* Softer rounded corners */
+      padding: 1.2rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s ease;
       border: none;
-      font-weight: 600;
+      font-family: 'Prompt', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      min-width: 160px;
+      justify-content: center;
     }
 
-    /* Primary Button */
     .button-group button.primary {
-      background: linear-gradient(135deg, #007bff, #0056b3); /* Blue gradient */
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
       color: white;
-      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
     }
+
     .button-group button.primary:hover {
-      background: linear-gradient(135deg, #0056b3, #004085);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
-    }
-    .button-group button.primary:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
     }
 
-    /* Secondary Button */
     .button-group button.secondary {
-      background: #6c757d; /* Grey color */
+      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
       color: white;
-      box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
-    }
-    .button-group button.secondary:hover {
-      background: #545b62;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(108, 117, 125, 0.4);
-    }
-    .button-group button.secondary:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 5px rgba(108, 117, 125, 0.2);
+      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
     }
 
-    /* Loading Overlay and Modal */
-    .loading-overlay, .modal-overlay {
+    .button-group button.secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+    }
+
+    .button-group button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Professional Modal Styling */
+    .modal-overlay, .loading-overlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -271,271 +589,375 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 1002;
+      backdrop-filter: blur(3px);
     }
-    .loading-content, .modal-content {
+
+    .modal-content, .loading-content {
       background: #fff;
-      padding: 2.5rem 3rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       text-align: center;
-      max-width: 450px;
-      animation: zoomIn 0.3s ease-out;
+      max-width: 500px;
+      border: 1px solid rgba(0,0,0,0.1);
     }
+
     .modal-content h3 {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-      color: #0056b3;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #1976D2;
+      font-weight: 700;
     }
+
     .modal-content p {
       font-size: 1.1rem;
       color: #555;
-      margin-bottom: 1.5rem;
-    }
-    .modal-close-button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 0.8rem 2rem;
-      border-radius: 8px;
-      font-size: 1.05rem;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    .modal-close-button:hover {
-      background: #0056b3;
-    }
-    @keyframes zoomIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      margin-bottom: 2rem;
+      line-height: 1.6;
     }
 
-    /* Responsive Adjustments for smaller screens */
+    .modal-close-button {
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+    }
+
+    .modal-close-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      border: 4px solid rgba(25, 118, 210, 0.2);
+      border-top: 4px solid #1976D2;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-message {
+      font-size: 1.2rem;
+      color: #546e7a;
+      font-weight: 500;
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-      .topnav {
+      .header-bar {
+        padding: 0 1rem;
+      }
+
+      .header-title {
+        font-size: 1rem;
+      }
+
+      .user-info-display {
+        display: none;
+      }
+
+      .sidebar {
+        width: 100%;
+        left: -100%;
+      }
+
+      .container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
         flex-direction: column;
-        height: auto;
-        padding: 0.8rem 1rem;
         gap: 0.5rem;
       }
-      .topnav .title {
-        text-align: center;
-        width: 100%;
-        font-size: 1.1rem;
+
+      .form-section {
+        padding: 1.5rem;
       }
-      .topnav .menu {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.8rem;
-        margin-top: 0.5rem;
-      }
-      .topnav .menu a {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.6rem;
-      }
-      .container {
-        margin: 1rem auto;
-        padding: 1.2rem;
-        border-radius: 12px;
-      }
-      h1 {
-        font-size: 2rem;
-      }
-      .subtitle {
-        font-size: 1rem;
-        padding-bottom: 1rem;
-        margin-bottom: 1.5rem;
-      }
-      .form-group {
-        margin-bottom: 1rem;
-      }
-      .form-group label {
-        font-size: 0.95rem;
-      }
-      .form-group input,
-      .form-group textarea,
-      .form-group select {
-        padding: 0.8rem;
-        font-size: 0.95rem;
-      }
+
       .radio-group {
-        flex-direction: column;
-        gap: 0.8rem;
+        grid-template-columns: 1fr;
       }
-      .radio-group label {
-        padding: 0.6rem 1rem;
-        font-size: 0.95rem;
-      }
-      .radio-group input[type="radio"] + span::before {
-        width: 16px;
-        height: 16px;
-        margin-right: 8px;
-      }
-      .radio-group input[type="radio"]:checked + span::after {
-        left: 15px;
-        font-size: 10px;
-      }
+
       .button-group {
         flex-direction: column;
-        gap: 0.8rem;
-        margin-top: 1.5rem;
+        align-items: center;
       }
+
       .button-group button {
         width: 100%;
-        padding: 0.9rem 1rem;
-        font-size: 1rem;
+        max-width: 300px;
       }
-      .loading-content, .modal-content {
-        padding: 1.5rem 2rem;
-        border-radius: 12px;
+    }
+
+    @media (min-width: 1200px) {
+      .main-wrapper.sidebar-open {
+        margin-left: 300px;
       }
-      .modal-content h3 {
-        font-size: 1.5rem;
-      }
-      .modal-content p {
-        font-size: 1rem;
-      }
-      .modal-close-button {
-        padding: 0.7rem 1.5rem;
-        font-size: 1rem;
-      }
+    }
+
+    /* Animation Classes */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .sidebar.open {
+      animation: slideIn 0.3s ease-out;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
-  <nav class="topnav">
-    <div class="title"><i class="fas fa-bolt"></i> ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</div>
-    <div class="menu">
-      <a onclick="loadDashboard()"><i class="fas fa-home"></i> หน้าหลัก</a>
-      <a class="active" onclick="loadReportRepair()"><i class="fas fa-plus-circle"></i> แจ้งซ่อมใหม่</a>
-      <a onclick="loadStatus()"><i class="fas fa-tools"></i> จัดการแจ้งซ่อม</a>
-      <a onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+  <!-- Header Bar -->
+  <header class="header-bar">
+    <div class="header-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <i class="fas fa-bolt header-icon"></i>
+      <div class="header-title">ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</div>
+    </div>
+    <div class="header-right">
+      <div class="user-menu">
+        <img src="https://placehold.co/36x36/1976D2/FFFFFF?text=👤" alt="User">
+        <div class="user-info-display">
+          <span class="username" id="loggedInUsername">ผู้ดูแลระบบ</span>
+          <div class="position" id="loggedInUserPosition">เจ้าหน้าที่</div>
+        </div>
+        <div class="dropdown">
+          <a href="#"><i class="fas fa-user-cog"></i> โปรไฟล์</a>
+          <a href="#"><i class="fas fa-cog"></i> ตั้งค่า</a>
+          <a onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Professional Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="fas fa-tools"></i>
+      </div>
+      <div class="title">ระบบจัดการแจ้งซ่อม</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">เมนูหลัก</div>
+        <a onclick="loadDashboard()">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>หน้าหลัก</span>
+        </a>
+        <a onclick="loadReportRepair()" class="active">
+          <i class="fas fa-plus-circle"></i>
+          <span>แจ้งซ่อมใหม่</span>
+        </a>
+        <a onclick="loadStatus()">
+          <i class="fas fa-clipboard-list"></i>
+          <span>จัดการแจ้งซ่อม</span>
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">รายงาน</div>
+        <a href="#">
+          <i class="fas fa-chart-bar"></i>
+          <span>รายงาน</span>
+        </a>
+        <a href="#">
+          <i class="fas fa-chart-pie"></i>
+          <span>สถิติ</span>
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">จัดการระบบ</div>
+        <a href="#">
+          <i class="fas fa-users"></i>
+          <span>จัดการผู้ใช้</span>
+        </a>
+        <a href="#">
+          <i class="fas fa-cogs"></i>
+          <span>ตั้งค่าระบบ</span>
+        </a>
+      </div>
     </div>
   </nav>
 
-  <!-- Main Content Container (Form) -->
-  <div class="container">
-    <h1>แจ้งซ่อม</h1>
-    <p class="subtitle">
-      โปรดแจ้งรายละเอียดของปัญหาและข้อมูลที่เกี่ยวข้อง
-    </p>
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-    <form id="repair-form">
-      <div class="form-section-title">
-        <h2>ข้อมูลผู้แจ้ง</h2>
-      </div>
-      <div class="form-group">
-        <label for="reporterName">ชื่อ-สกุลผู้แจ้ง: <span class="required">*</span></label>
-        <input type="text" id="reporterName" name="reporterName" placeholder="เช่น นายสมชาย ใจดี" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="phoneNumber">เบอร์โทรศัพท์: <span class="required">*</span></label>
-        <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="เช่น 0812345678" required pattern="[0-9]{10,12}">
-        <div class="help-text">รองรับเบอร์โทรศัพท์ 10-12 หลัก (ตัวเลขเท่านั้น)</div>
-      </div>
-      
-      <div class="form-group">
-        <label for="department">หน่วยงาน:</label>
-        <input type="text" id="department" name="department" placeholder="หน่วยงานที่สังกัด (ไม่บังคับ)">
-      </div>
-      
-      <div class="form-group">
-        <label for="citizenID">หมายเลขประจำตัวประชาชน:</label>
-        <input type="text" id="citizenID" name="citizenID" placeholder="13 หลัก (ไม่บังคับ)" maxlength="13" pattern="[0-9]{13}">
-        <div class="help-text">ไม่บังคับ แต่จะช่วยให้การติดตามผลการซ่อมแซมดีขึ้น</div>
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper" id="mainWrapper">
+    <div class="container">
+      <div class="page-header">
+        <h1>
+          <i class="fas fa-plus-circle"></i>
+          แจ้งซ่อม
+        </h1>
+        <p class="subtitle">
+          โปรดกรอกรายละเอียดของปัญหาและข้อมูลที่เกี่ยวข้องให้ครบถ้วนเพื่อให้การดำเนินการเป็นไปอย่างรวดเร็วและมีประสิทธิภาพ
+        </p>
       </div>
 
-      <div class="form-section-title" style="margin-top: 2.5rem;">
-        <h2>รายละเอียดการแจ้งซ่อม</h2>
-      </div>
-      <div class="form-group">
-        <label for="location">สถานที่เกิดเหตุ: <span class="required">*</span></label>
-        <input type="text" id="location" name="location" placeholder="เช่น 123 หมู่ 5 ต.บ้านเหนือ อ.เมือง จ.เชียงใหม่" required>
-      </div>
-      
-      <div class="form-group">
-        <label>ประเภทการแจ้งซ่อม: <span class="required">*</span></label>
-        <div class="radio-group">
-          <label>
-            <input type="radio" name="repairType" value="ไฟฟ้าสาธารณะ" required>
-            <span><i class="fas fa-lightbulb"></i> ไฟฟ้าสาธารณะ</span>
-          </label>
-          <label>
-            <input type="radio" name="repairType" value="ถนน/ทางเท้า" required>
-            <span><i class="fas fa-road"></i> ถนน/ทางเท้า</span>
-          </label>
-          <label>
-            <input type="radio" name="repairType" value="น้ำประปา" required>
-            <span><i class="fas fa-faucet"></i> น้ำประปา</span>
-          </label>
-          <label>
-            <input type="radio" name="repairType" value="อื่นๆ" required>
-            <span><i class="fas fa-ellipsis-h"></i> อื่นๆ</span>
-          </label>
+      <form id="repair-form">
+        <!-- ข้อมูลผู้แจ้ง -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <h2><i class="fas fa-user"></i> ข้อมูลผู้แจ้ง</h2>
+          </div>
+          
+          <div class="form-group">
+            <label for="reporterName">ชื่อ-สกุลผู้แจ้ง <span class="required">*</span></label>
+            <input type="text" id="reporterName" name="reporterName" placeholder="เช่น นายสมชาย ใจดี" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="phoneNumber">เบอร์โทรศัพท์ <span class="required">*</span></label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="เช่น 0812345678" required pattern="[0-9]{10,12}">
+            <div class="help-text">รองรับเบอร์โทรศัพท์ 10-12 หลัก (ตัวเลขเท่านั้น)</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="department">หน่วยงาน</label>
+            <input type="text" id="department" name="department" placeholder="หน่วยงานที่สังกัด (ไม่บังคับ)">
+          </div>
+          
+          <div class="form-group">
+            <label for="citizenID">หมายเลขประจำตัวประชาชน</label>
+            <input type="text" id="citizenID" name="citizenID" placeholder="13 หลัก (ไม่บังคับ)" maxlength="13" pattern="[0-9]{13}">
+            <div class="help-text">ไม่บังคับ แต่จะช่วยให้การติดตามผลการซ่อมแซมดีขึ้น</div>
+          </div>
         </div>
-      </div>
-      
-      <div class="form-group">
-        <label for="repairDesc">รายละเอียดปัญหา: <span class="required">*</span></label>
-        <textarea id="repairDesc" name="repairDesc" placeholder="อธิบายปัญหา เช่น หลอดไฟเสีย, สายไฟขาด, น้ำรั่ว, ถนนชำรุด" rows="5" required></textarea>
-        <div class="help-text">กรอกรายละเอียดปัญหาให้ครบถ้วนและชัดเจนที่สุด</div>
-      </div>
-      
-      <!-- File Upload Section for Photo -->
-      <div class="form-section-title" style="margin-top: 2.5rem;">
-        <h2>แนบรูปภาพ</h2>
-      </div>
-      <div class="form-group">
-        <label for="photoUpload">เลือกไฟล์รูปภาพ:</label>
-        <input type="file" id="photoUpload" name="photoUpload" accept="image/*">
-        <div class="help-text">* รองรับไฟล์รูปภาพเท่านั้น (JPG, PNG, GIF) ขนาดไม่เกิน 5MB</div>
-        <div id="photoPreviewContainer" class="file-upload-preview" style="display: none;">
-          <img id="photoPreview" src="" alt="Photo Preview">
-          <span id="photoFileName"></span>
-          <button type="button" onclick="clearPhotoSelection()">ลบ</button>
-        </div>
-      </div>
 
-      <div class="form-section-title" style="margin-top: 2.5rem;">
-        <h2>ข้อมูลพิกัด</h2>
-      </div>
-      <div class="form-group">
-        <label for="geoStamp">ประทับเวลาทางภูมิศาสตร์:</label>
-        <input type="text" id="geoStamp" name="geoStamp" placeholder="เช่น 2024-06-27 10:30:00">
-        <div class="help-text">วันที่และเวลาที่เกิดเหตุหรือบันทึกข้อมูล</div>
-      </div>
-      
-      <div class="form-group">
-        <label for="geoCode">พิกัดทางภูมิศาสตร์ (ละติจูด, ลองจิจูด):</label>
-        <input type="text" id="geoCode" name="geoCode" placeholder="เช่น 13.7563, 100.5018">
-        <div class="help-text">ตัวอย่าง: ละติจูด, ลองจิจูด</div>
-      </div>
-      
-      <div class="form-group">
-        <label for="geoAddress">ที่อยู่จากพิกัด:</label>
-        <input type="text" id="geoAddress" name="geoAddress" placeholder="เช่น 123 ถนนสุขุมวิท เขตวัฒนา กรุงเทพฯ 10110">
-        <div class="help-text">ที่อยู่แบบเต็มที่เกี่ยวข้องกับพิกัด</div>
-      </div>
-      
-      <div class="button-group">
-        <button type="button" class="primary" onclick="submitRepair()" id="submit-btn">
-          <i class="fas fa-paper-plane"></i> ส่งแจ้งซ่อม
-        </button>
-        <button type="button" class="secondary" onclick="loadDashboard()">
-          <i class="fas fa-times-circle"></i> ยกเลิก
-        </button>
-      </div>
-    </form>
+        <!-- รายละเอียดการแจ้งซ่อม -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <h2><i class="fas fa-tools"></i> รายละเอียดการแจ้งซ่อม</h2>
+          </div>
+          
+          <div class="form-group">
+            <label for="location">สถานที่เกิดเหตุ <span class="required">*</span></label>
+            <input type="text" id="location" name="location" placeholder="เช่น 123 หมู่ 5 ต.บ้านเหนือ อ.เมือง จ.เชียงใหม่" required>
+          </div>
+          
+          <div class="form-group">
+            <label>ประเภทการแจ้งซ่อม <span class="required">*</span></label>
+            <div class="radio-group">
+              <label>
+                <input type="radio" name="repairType" value="ไฟฟ้าสาธารณะ" required>
+                <span><i class="fas fa-lightbulb"></i> ไฟฟ้าสาธารณะ</span>
+              </label>
+              <label>
+                <input type="radio" name="repairType" value="ถนน/ทางเท้า" required>
+                <span><i class="fas fa-road"></i> ถนน/ทางเท้า</span>
+              </label>
+              <label>
+                <input type="radio" name="repairType" value="น้ำประปา" required>
+                <span><i class="fas fa-faucet"></i> น้ำประปา</span>
+              </label>
+              <label>
+                <input type="radio" name="repairType" value="อื่นๆ" required>
+                <span><i class="fas fa-ellipsis-h"></i> อื่นๆ</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="repairDesc">รายละเอียดปัญหา <span class="required">*</span></label>
+            <textarea id="repairDesc" name="repairDesc" placeholder="อธิบายปัญหา เช่น หลอดไฟเสีย, สายไฟขาด, น้ำรั่ว, ถนนชำรุด" rows="5" required></textarea>
+            <div class="help-text">กรอกรายละเอียดปัญหาให้ครบถ้วนและชัดเจนที่สุด</div>
+          </div>
+        </div>
+
+        <!-- แนบรูปภาพ -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <h2><i class="fas fa-camera"></i> แนบรูปภาพ</h2>
+          </div>
+          
+          <div class="form-group">
+            <label for="photoUpload">เลือกไฟล์รูปภาพ</label>
+            <input type="file" id="photoUpload" name="photoUpload" accept="image/*">
+            <div class="help-text">รองรับไฟล์รูปภาพเท่านั้น (JPG, PNG, GIF) ขนาดไม่เกิน 5MB</div>
+            <div id="photoPreviewContainer" class="file-upload-preview" style="display: none;">
+              <img id="photoPreview" src="" alt="Photo Preview">
+              <span id="photoFileName"></span>
+              <button type="button" onclick="clearPhotoSelection()">
+                <i class="fas fa-trash"></i> ลบ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ข้อมูลพิกัด -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <h2><i class="fas fa-map-marker-alt"></i> ข้อมูลพิกัด</h2>
+          </div>
+          
+          <div class="form-group">
+            <label for="geoStamp">ประทับเวลาทางภูมิศาสตร์</label>
+            <input type="text" id="geoStamp" name="geoStamp" placeholder="เช่น 2024-06-27 10:30:00">
+            <div class="help-text">วันที่และเวลาที่เกิดเหตุหรือบันทึกข้อมูล</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="geoCode">พิกัดทางภูมิศาสตร์ (ละติจูด, ลองจิจูด)</label>
+            <input type="text" id="geoCode" name="geoCode" placeholder="เช่น 13.7563, 100.5018">
+            <div class="help-text">ตัวอย่าง: ละติจูด, ลองจิจูด</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="geoAddress">ที่อยู่จากพิกัด</label>
+            <input type="text" id="geoAddress" name="geoAddress" placeholder="เช่น 123 ถนนสุขุมวิท เขตวัฒนา กรุงเทพฯ 10110">
+            <div class="help-text">ที่อยู่แบบเต็มที่เกี่ยวข้องกับพิกัด</div>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button type="button" class="primary" onclick="submitRepair()" id="submit-btn">
+            <i class="fas fa-paper-plane"></i> ส่งแจ้งซ่อม
+          </button>
+          <button type="button" class="secondary" onclick="loadDashboard()">
+            <i class="fas fa-times-circle"></i> ยกเลิก
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="loading-overlay" style="display: none;">
     <div class="loading-content">
       <div class="loading-spinner"></div>
-      <p id="loading-message">กำลังดำเนินการ...</p>
+      <p id="loading-message" class="loading-message">กำลังดำเนินการ...</p>
     </div>
   </div>
 
@@ -560,6 +982,68 @@
     function debugLog(message) {
       console.log('🔧 REPORT DEBUG:', message);
     }
+
+    // Sidebar functions
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      
+      if (sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    }
+
+    function openSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+      
+      if (window.innerWidth >= 1200) {
+        mainWrapper.classList.add('sidebar-open');
+      }
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+      mainWrapper.classList.remove('sidebar-open');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const menuToggle = document.querySelector('.menu-toggle');
+      
+      if (sidebar.classList.contains('open') && 
+          !sidebar.contains(event.target) && 
+          !menuToggle.contains(event.target)) {
+        closeSidebar();
+      }
+    });
+
+    // Close sidebar on window resize if needed
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 1200) {
+        const sidebar = document.getElementById('sidebar');
+        const mainWrapper = document.getElementById('mainWrapper');
+        if (sidebar.classList.contains('open')) {
+          mainWrapper.classList.add('sidebar-open');
+        }
+      } else {
+        const mainWrapper = document.getElementById('mainWrapper');
+        mainWrapper.classList.remove('sidebar-open');
+      }
+    });
 
     /**
      * Displays a custom modal dialog with a given message and title.
@@ -604,13 +1088,12 @@
     }
 
     // --- Navigation Functions ---
-    // These functions use google.script.run to load different HTML pages from Code.gs.
-
     /**
      * Loads the Dashboard page.
      */
     function loadDashboard() {
       debugLog('loadDashboard called');
+      closeSidebar();
       try {
         if (typeof google === 'undefined' || !google.script || !google.script.run) {
           throw new Error('Google Apps Script is not available. Please ensure the app is deployed correctly.');
@@ -627,7 +1110,7 @@
             hideLoading();
             showModal('เกิดข้อผิดพลาดในการโหลดหน้าหลัก: ' + e.message, 'ข้อผิดพลาด');
           })
-          .getDashboardPage(); // Calls getDashboardPage function in Code.gs
+          .getDashboardPage();
       } catch (error) {
         hideLoading();
         showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
@@ -636,11 +1119,10 @@
 
     /**
      * Loads the Report Repair page.
-     * (Typically, this function is called when navigating to this page,
-     * so a full reload might not be necessary if already on the page.)
      */
     function loadReportRepair() {
       debugLog('loadReportRepair called');
+      closeSidebar();
       try {
         if (typeof google === 'undefined' || !google.script || !google.script.run) {
           throw new Error('Google Apps Script is not available. Please ensure the app is deployed correctly.');
@@ -657,7 +1139,7 @@
             hideLoading();
             showModal('เกิดข้อผิดพลาดในการโหลดหน้าแจ้งซ่อม: ' + e.message, 'ข้อผิดพลาด');
           })
-          .getReportRepairPage(); // Calls getReportRepairPage function in Code.gs
+          .getReportRepairPage();
       } catch (error) {
         hideLoading();
         showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
@@ -669,6 +1151,7 @@
      */
     function loadStatus() {
       debugLog('loadStatus called');
+      closeSidebar();
       try {
         if (typeof google === 'undefined' || !google.script || !google.script.run) {
           throw new Error('Google Apps Script is not available. Please ensure the app is deployed correctly.');
@@ -685,7 +1168,7 @@
             hideLoading();
             showModal('เกิดข้อผิดพลาดในการโหลดหน้าจัดการแจ้งซ่อม: ' + e.message, 'ข้อผิดพลาด');
           })
-          .getStatusPage(); // Calls getStatusPage function in Code.gs
+          .getStatusPage();
       } catch (error) {
         hideLoading();
         showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
@@ -697,6 +1180,7 @@
      */
     function logout() {
       debugLog('logout called');
+      closeSidebar();
       showModal('คุณต้องการออกจากระบบหรือไม่?', 'ยืนยันการออกจากระบบ').then(() => {
         try {
           if (typeof google === 'undefined' || !google.script || !google.script.run) {
@@ -714,7 +1198,7 @@
               hideLoading();
               showModal('เกิดข้อผิดพลาดในการออกจากระบบ: ' + e.message, 'ข้อผิดพลาด');
             })
-            .doLogout(); // Calls doLogout function in Code.gs
+            .doLogout();
         } catch (error) {
           hideLoading();
           showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
@@ -722,67 +1206,18 @@
       });
     }
 
-    // --- File Upload Handling ---
-
-    // Event listener for when a file is selected in the photo upload input.
-    document.addEventListener('DOMContentLoaded', function() {
-      const photoUploadInput = document.getElementById('photoUpload');
-      const photoPreviewContainer = document.getElementById('photoPreviewContainer');
-      const photoPreviewImg = document.getElementById('photoPreview');
-      const photoFileNameSpan = document.getElementById('photoFileName');
-
-      photoUploadInput.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
-          // Validate file type (image/* is already in accept attribute, but double check)
-          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-          if (!allowedTypes.includes(file.type)) {
-            showModal('กรุณาเลือกไฟล์รูปภาพ (JPG, PNG, GIF) เท่านั้น', 'รูปแบบไฟล์ไม่ถูกต้อง');
-            photoUploadInput.value = ''; // Clear file input
-            clearPhotoSelection();
-            return;
-          }
-
-          // Validate file size (max 5MB)
-          const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-          if (file.size > maxSize) {
-            showModal('ขนาดไฟล์รูปภาพต้องไม่เกิน 5MB', 'ไฟล์ขนาดใหญ่เกินไป');
-            photoUploadInput.value = ''; // Clear file input
-            clearPhotoSelection();
-            return;
-          }
-
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            selectedImageBase64 = e.target.result; // Store Base64 data
-            selectedImageFileName = file.name; // Store file name
-
-            photoPreviewImg.src = selectedImageBase64;
-            photoFileNameSpan.textContent = file.name;
-            photoPreviewContainer.style.display = 'flex'; // Show preview container
-            debugLog(`Image selected: ${file.name}, size: ${file.size} bytes`);
-          };
-          reader.readAsDataURL(file); // Read file as Base64 data URL
-        } else {
-          clearPhotoSelection(); // Clear selection if no file or canceled
-        }
-      });
-    });
-
     /**
      * Clears the selected photo and resets the preview.
      */
     function clearPhotoSelection() {
       selectedImageBase64 = null;
       selectedImageFileName = null;
-      document.getElementById('photoUpload').value = ''; // Clear the file input element
+      document.getElementById('photoUpload').value = '';
       document.getElementById('photoPreview').src = '';
       document.getElementById('photoFileName').textContent = '';
-      document.getElementById('photoPreviewContainer').style.display = 'none'; // Hide preview container
+      document.getElementById('photoPreviewContainer').style.display = 'none';
       debugLog('Photo selection cleared.');
     }
-
-    // --- Form Submission Logic ---
 
     /**
      * Collects form data, performs client-side validation, and sends data to Google Apps Script.
@@ -798,7 +1233,7 @@
       const location = document.getElementById('location').value.trim();
       const repairType = document.querySelector('input[name="repairType"]:checked');
       const repairDesc = document.getElementById('repairDesc').value.trim();
-      const citizenID = document.getElementById('citizenID').value.trim(); // Get citizen ID (optional)
+      const citizenID = document.getElementById('citizenID').value.trim();
 
       // Get manually entered geo data
       const geoStamp = document.getElementById('geoStamp').value.trim();
@@ -825,21 +1260,21 @@
 
       // Compile all form data into an object to send to Apps Script
       const formData = {
-        'reporterName': reporterName, // ใช้ชื่อ key ที่ตรงกับ submitNewRepair ใน Code.gs
+        'reporterName': reporterName,
         'phoneNumber': phoneNumber,
         'location': location,
         'department': document.getElementById('department').value.trim(),
         'citizenID': citizenID,
         'repairType': repairType.value,
         'repairDesc': repairDesc,
-        'photoUrl': '', // This will be populated by the uploaded URL in Code.gs if base64PhotoData exists
-        'base64PhotoData': selectedImageBase64, // Base64 data for image upload
-        'photoFileName': selectedImageFileName, // File name for image upload
-        'geoStamp': geoStamp,   // Manually entered GeoStamp
-        'geoCode': geoCode,     // Manually entered GeoCode
-        'geoAddress': geoAddress, // Manually entered GeoAddress
-        'status': 'แจ้งซ่อมแล้ว', // Default status for new repair requests
-        'assignee': '' // Default empty assignee
+        'photoUrl': '',
+        'base64PhotoData': selectedImageBase64,
+        'photoFileName': selectedImageFileName,
+        'geoStamp': geoStamp,
+        'geoCode': geoCode,
+        'geoAddress': geoAddress,
+        'status': 'แจ้งซ่อมแล้ว',
+        'assignee': ''
       };
 
       // Disable submit button and show loading indicator
@@ -852,15 +1287,14 @@
           throw new Error('Google Apps Script environment is not ready. Please refresh the page or check deployment.');
         }
 
-        // --- IMPORTANT CHANGE HERE: Calling submitNewRepair instead of submitRepairForm ---
         google.script.run
           .withSuccessHandler(() => {
             hideLoading();
             submitBtn.disabled = false;
             showModal('แจ้งซ่อมสำเร็จ!', 'สำเร็จ').then(() => {
-              form.reset(); // Clear all form fields
-              clearPhotoSelection(); // Clear photo preview
-              loadStatus(); // Redirect to status page after successful submission
+              form.reset();
+              clearPhotoSelection();
+              loadStatus();
             });
           })
           .withFailureHandler(e => {
@@ -869,7 +1303,7 @@
             showModal('เกิดข้อผิดพลาดในการแจ้งซ่อม: ' + e.message, 'ข้อผิดพลาด');
             debugLog('Submission failed: ' + e.message);
           })
-          .submitNewRepair(formData); // <--- THIS IS THE FIX: Call submitNewRepair
+          .submitNewRepair(formData);
           
       } catch (error) {
         hideLoading();
@@ -880,37 +1314,74 @@
     }
 
     // --- Page Initialization ---
-
-    // Event listener for when the DOM is fully loaded.
     document.addEventListener('DOMContentLoaded', function() {
       debugLog('Report repair page loaded, initializing...');
+
+      // File upload event listener
+      const photoUploadInput = document.getElementById('photoUpload');
+      const photoPreviewContainer = document.getElementById('photoPreviewContainer');
+      const photoPreviewImg = document.getElementById('photoPreview');
+      const photoFileNameSpan = document.getElementById('photoFileName');
+
+      photoUploadInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          // Validate file type
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if (!allowedTypes.includes(file.type)) {
+            showModal('กรุณาเลือกไฟล์รูปภาพ (JPG, PNG, GIF) เท่านั้น', 'รูปแบบไฟล์ไม่ถูกต้อง');
+            photoUploadInput.value = '';
+            clearPhotoSelection();
+            return;
+          }
+
+          // Validate file size (max 5MB)
+          const maxSize = 5 * 1024 * 1024;
+          if (file.size > maxSize) {
+            showModal('ขนาดไฟล์รูปภาพต้องไม่เกิน 5MB', 'ไฟล์ขนาดใหญ่เกินไป');
+            photoUploadInput.value = '';
+            clearPhotoSelection();
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            selectedImageBase64 = e.target.result;
+            selectedImageFileName = file.name;
+
+            photoPreviewImg.src = selectedImageBase64;
+            photoFileNameSpan.textContent = file.name;
+            photoPreviewContainer.style.display = 'flex';
+            debugLog(`Image selected: ${file.name}, size: ${file.size} bytes`);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          clearPhotoSelection();
+        }
+      });
       
       let attempts = 0;
-      const maxAttempts = 10; // Max attempts to check for google.script.run availability
+      const maxAttempts = 10;
       
-      /**
-       * Recursively checks if google.script.run is available.
-       */
       function checkGoogleScript() {
         attempts++;
         debugLog('Checking Google Apps Script availability, attempt: ' + attempts);
         
         if (typeof google !== 'undefined' && google.script && google.script.run) {
           debugLog('Google Apps Script is ready for report repair page.');
-          // Any initial setup specific to this page can go here if needed.
         } else if (attempts < maxAttempts) {
           debugLog('Google Apps Script not ready yet, retrying in 500ms...');
-          setTimeout(checkGoogleScript, 500); // Retry after 500ms
+          setTimeout(checkGoogleScript, 500);
         } else {
           debugLog('Google Apps Script failed to load after ' + maxAttempts + ' attempts for report repair page.');
           showModal('ระบบไม่สามารถโหลด Google Apps Script ได้<br><br>กรุณา:<br>1. ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต<br>2. ปิด Ad Blocker (ถ้ามี)<br>3. รีเฟรชหน้าเว็บ', 'ไม่สามารถโหลดระบบได้');
         }
       }
       
-      checkGoogleScript(); // Start checking on page load
+      checkGoogleScript();
     });
 
-    // Global error handler to catch uncaught JavaScript errors.
+    // Global error handler
     window.addEventListener('error', function(e) {
       debugLog('Global error on report repair page: ' + (e.error?.message || e.message));
       console.error('Global error on report repair page:', e);

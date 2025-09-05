@@ -4,212 +4,527 @@
   <meta charset="UTF-8">
   <title>จัดการแจ้งซ่อม - ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <?!= include('style'); ?>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
   <style>
-    /* Global styles and overrides for body and general layout */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background: linear-gradient(to bottom right, #f0f2f5, #e0e6ed); /* Lighter grey gradient */
-      color: #343a40;
-      display: block;
-      padding-top: 0;
+      font-family: 'Prompt', sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      display: flex;
       min-height: 100vh;
-      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
     }
 
-    /* Top Navigation Bar */
-    .topnav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #343a40; /* Dark background for nav */
-      padding: 0 1.5rem;
+    /* Top Header Bar */
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 60px;
-      color: #fff;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      z-index: 1001;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
-    .topnav .title {
-      font-size: 1.2rem;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      color: #fff;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      margin-right: 1rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .menu-toggle:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-1px);
+    }
+
+    .header-title {
+      font-size: 1.3rem;
       font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .header-icon {
+      margin-right: 0.8rem;
+      font-size: 1.4rem;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+
+    /* User Menu in Header */
+    .user-menu {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-left: 1rem;
+      padding: 0.4rem 1rem;
+      border-radius: 25px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+
+    .user-menu:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .user-menu img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.3);
+      transition: all 0.2s ease;
+    }
+
+    .user-menu:hover img {
+      transform: scale(1.05);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .user-info-display {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      color: #e3f2fd;
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+
+    .user-info-display .username {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .user-info-display .position {
+      font-size: 0.8rem;
+      color: #bbdefb;
+      opacity: 0.9;
+    }
+
+    .user-menu .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 8px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      overflow: hidden;
+      min-width: 180px;
+      z-index: 1002;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .user-menu .dropdown a {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      color: #2c3e50;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      gap: 0.8rem;
+    }
+
+    .user-menu .dropdown a:hover {
+      background: #f8f9fa;
+      color: #1976D2;
+      padding-left: 1.5rem;
+    }
+
+    .user-menu:hover .dropdown {
+      display: block;
+    }
+
+    /* Professional Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 60px;
+      left: -300px;
+      width: 300px;
+      height: calc(100vh - 60px);
+      background: linear-gradient(180deg, #34495e 0%, #2c3e50 100%);
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 3px solid #3498db;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      background: rgba(0,0,0,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+
+    .sidebar-header .logo {
+      font-size: 1.8rem;
+      color: #3498db;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-header .title {
+      color: #ecf0f1;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .sidebar-nav {
+      padding: 1rem 0;
+    }
+
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-section-title {
+      padding: 0.8rem 1.5rem 0.5rem;
+      color: #95a5a6;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      color: #bdc3c7;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .sidebar-nav a:hover {
+      background: rgba(52, 152, 219, 0.15);
+      border-left-color: #3498db;
+      color: #ecf0f1;
+      padding-left: 2rem;
+      transform: translateX(5px);
+    }
+
+    .sidebar-nav a.active {
+      background: linear-gradient(90deg, rgba(231, 76, 60, 0.2) 0%, rgba(231, 76, 60, 0.05) 100%);
+      border-left-color: #e74c3c;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .sidebar-nav a.active::after {
+      content: '';
+      position: absolute;
+      right: 1rem;
+      width: 8px;
+      height: 8px;
+      background: #e74c3c;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+    }
+
+    .sidebar-nav a i {
+      width: 24px;
+      margin-right: 1rem;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .sidebar-nav a span {
+      flex-grow: 1;
+    }
+
+    /* Overlay */
+    .sidebar-overlay {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 60px);
+      background: rgba(0,0,0,0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 999;
+      backdrop-filter: blur(2px);
+    }
+
+    .sidebar-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Main Content */
+    .main-wrapper {
+      flex: 1;
+      margin-top: 60px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 2.5rem;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f3f4;
+    }
+
+    .page-header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #1976D2;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .page-header .subtitle {
+      font-size: 1.2rem;
+      color: #546e7a;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Professional Filter Section */
+    .filter-section {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 15px;
+      border: 1px solid #dee2e6;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .filter-section input[type="text"],
+    .filter-section select {
+      padding: 0.9rem 1.2rem;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Prompt', sans-serif;
+      background: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .filter-section input[type="text"]:focus,
+    .filter-section select:focus {
+      outline: none;
+      border-color: #1976D2;
+      box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .filter-section button {
+      padding: 0.9rem 1.8rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Prompt', sans-serif;
+      text-transform: none;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
-    .topnav .menu {
-      display: flex;
-      gap: 1.5rem;
+
+    .filter-section button.primary {
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
     }
-    .topnav .menu a {
-      color: #adb5bd; /* Lighter grey for links */
-      text-decoration: none;
-      font-size: 1rem;
-      padding: 0.5rem 0.8rem;
-      border-radius: 8px;
-      transition: background-color 0.3s ease, transform 0.2s ease, color 0.3s ease;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .topnav .menu a.active,
-    .topnav .menu a:hover {
-      background-color: rgba(255,255,255,0.15);
+
+    .filter-section button.primary:hover {
       transform: translateY(-2px);
-      color: #fff;
+      box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
     }
 
-    /* Main Content Container */
-    .container {
-      max-width: 1200px; /* Wider container for data tables */
-      margin: 2.5rem auto;
-      padding: 2.5rem;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-      animation: fadeIn 0.8s ease-out;
+    .filter-section button.secondary {
+      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .filter-section button.secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 0.8rem;
-      font-weight: 700;
-      font-size: 2.5rem;
-      color: #007bff;
-    }
-
-    .subtitle {
-      margin: 0 0 2.5rem;
-      color: #6c757d;
-      font-size: 1.15rem;
-      line-height: 1.5;
-      text-align: center;
-      border-bottom: 1px solid #dee2e6;
-      padding-bottom: 1.5rem;
-    }
-
-    /* Filter and Search Bar */
-    .filter-section {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 2rem;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 12px;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .filter-section input[type="text"],
-    .filter-section select {
-        padding: 0.8rem 1rem;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-        font-size: 1rem;
-        flex-grow: 1; /* Allows inputs to grow */
-        max-width: 300px; /* Max width for individual inputs */
-    }
-    .filter-section button {
-        padding: 0.8rem 1.5rem;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-    .filter-section button:hover {
-        background-color: #0056b3;
-        transform: translateY(-2px);
-    }
-
-    /* Repair Table Styling */
+    /* Professional Table */
     .repair-table-container {
-      overflow-x: auto; /* Enable horizontal scrolling on small screens */
+      overflow-x: auto;
       margin-top: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      background-color: #fdfdfd;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      background-color: #fff;
+      border: 1px solid #e3f2fd;
     }
 
     .repair-table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 800px; /* Ensure table doesn't get too small */
-    }
-
-    .repair-table th,
-    .repair-table td {
-      padding: 12px 15px;
-      text-align: left;
-      border-bottom: 1px solid #e9ecef;
+      min-width: 1000px;
     }
 
     .repair-table th {
-      background-color: #007bff; /* Primary blue for table header */
+      padding: 1.2rem 1rem;
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
       color: white;
       font-weight: 600;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-      position: sticky; /* Keep header sticky on scroll */
+      text-align: left;
+      font-size: 0.95rem;
+      position: sticky;
       top: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 3px solid #0d47a1;
+    }
+
+    .repair-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f1f3f4;
+      vertical-align: middle;
+      font-size: 0.95rem;
+    }
+
+    .repair-table tbody tr {
+      transition: all 0.2s ease;
     }
 
     .repair-table tbody tr:hover {
-      background-color: #e2f2ff; /* Light blue on row hover */
-      cursor: pointer;
-    }
-    .repair-table tbody tr:nth-child(even) {
-        background-color: #f8f9fa; /* Zebra striping */
+      background: linear-gradient(90deg, #e3f2fd 0%, #f3e5f5 100%);
+      transform: translateX(2px);
+      box-shadow: 4px 0 8px rgba(0,0,0,0.1);
     }
 
-    /* Status Badges */
+    .repair-table tbody tr:nth-child(even) {
+      background-color: #fafbfc;
+    }
+
+    /* Enhanced Status Badges */
     .status-badge {
-      display: inline-block;
-      padding: 0.4em 0.8em;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
       border-radius: 20px;
-      font-size: 0.85em;
+      font-size: 0.85rem;
       font-weight: 600;
       text-align: center;
       white-space: nowrap;
       color: white;
+      gap: 0.4rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    .status-badge.reported { background-color: #ffc107; color: #343a40; } /* Yellow */
-    .status-badge.in-progress { background-color: #17a2b8; } /* Cyan */
-    .status-badge.completed { background-color: #28a745; } /* Green */
-    .status-badge.cancelled { background-color: #6c757d; } /* Grey */
 
-    /* Action Buttons in table */
-    .action-buttons button {
-      background-color: #6c757d; /* Default grey for action */
+    .status-badge.reported { 
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
       color: white;
-      border: none;
-      padding: 0.5em 0.8em;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.85em;
-      margin-right: 5px;
-      transition: background-color 0.3s ease, transform 0.2s ease;
     }
-    .action-buttons button:hover {
-        transform: translateY(-1px);
+    .status-badge.in-progress { 
+      background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
     }
-    .action-buttons button.view { background-color: #007bff; } /* Blue for view */
-    .action-buttons button.view:hover { background-color: #0056b3; }
-    .action-buttons button.edit { background-color: #ffc107; color: #343a40; } /* Yellow for edit */
-    .action-buttons button.edit:hover { background-color: #e0a800; }
-    .action-buttons button.delete { background-color: #dc3545; } /* Red for delete */
-    .action-buttons button.delete:hover { background-color: #c82333; }
-    .action-buttons button.complete { background-color: #28a745; } /* Green for complete */
-    .action-buttons button.complete:hover { background-color: #218838; }
+    .status-badge.completed { 
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+    }
+    .status-badge.cancelled { 
+      background: linear-gradient(135deg, #757575 0%, #424242 100%);
+    }
 
-    /* Custom Modal */
+    /* Professional Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons button {
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Prompt', sans-serif;
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .action-buttons button.view {
+      background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+      color: white;
+      box-shadow: 0 3px 10px rgba(33, 150, 243, 0.3);
+    }
+
+    .action-buttons button.edit {
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      color: white;
+      box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+    }
+
+    .action-buttons button.delete {
+      background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+      color: white;
+      box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);
+    }
+
+    .action-buttons button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    /* Professional Modal Styling */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -220,955 +535,288 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
-    }
-    .modal-content {
-      background: #fff;
-      padding: 2.5rem 3rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-      text-align: center;
-      max-width: 600px; /* Wider modal for details */
-      animation: zoomIn 0.3s ease-out;
-      overflow-y: auto; /* Enable scrolling for modal content */
-      max-height: 90vh; /* Max height of modal */
-    }
-    .modal-content h3 {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-      color: #0056b3;
-    }
-    .modal-content p {
-      font-size: 1.1rem;
-      color: #555;
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-      text-align: left;
-    }
-    .modal-content .detail-item {
-        margin-bottom: 0.8rem;
-    }
-    .modal-content .detail-item strong {
-        display: inline-block;
-        width: 150px; /* Align labels */
-        color: #343a40;
-    }
-    .modal-content .detail-item img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin-top: 1rem;
-        border: 1px solid #eee;
-    }
-    .modal-close-button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 0.8rem 2rem;
-      border-radius: 8px;
-      font-size: 1.05rem;
-      cursor: pointer;
-      transition: background 0.2s ease;
-      margin-top: 1.5rem;
-    }
-    .modal-close-button:hover {
-      background: #0056b3;
-    }
-    @keyframes zoomIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    
-    /* Responsive Adjustments for Modal */
-    @media (max-width: 768px) {
-      .modal-content {
-        padding: 1.5rem;
-        max-width: 95%;
-      }
-      .modal-content h3 {
-        font-size: 1.5rem;
-      }
-      .modal-content p {
-        font-size: 1rem;
-      }
-      .modal-content .detail-item strong {
-          width: 100px; /* Adjust label width for smaller screens */
-          display: block; /* Stack label and value */
-          margin-bottom: 0.2rem;
-      }
-      .modal-close-button {
-        padding: 0.7rem 1.5rem;
-        font-size: 1rem;
-      }
+      z-index: 1002;
+      backdrop-filter: blur(3px);
     }
 
-    /* Custom Loading Overlay */
+    .modal-content {
+      background: #fff;
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .modal-content h3 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #1976D2;
+      font-weight: 700;
+    }
+
+    .modal-close-button {
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 2rem;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+    }
+
+    .modal-close-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+    }
+
+    /* Loading Overlay */
     .loading-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
-    }
-    .loading-content {
-      background: #fff;
-      padding: 2.5rem 3rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-      text-align: center;
-      max-width: 450px;
-      animation: zoomIn 0.3s ease-out;
-    }
-    .loading-spinner {
-        border: 4px solid rgba(0, 123, 255, 0.3); /* Blue spinner */
-        border-top: 4px solid #007bff;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 15px auto;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    .loading-message {
-        font-size: 1.1rem;
-        color: #555;
+      z-index: 1003;
+      backdrop-filter: blur(3px);
     }
 
-    /* Styles for the edit modal's form groups */
-    #edit-modal .form-group label {
-        display: block;
-        margin-bottom: 0.6rem;
-        font-weight: 600;
-        color: #444;
+    .loading-content {
+      background: #fff;
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .loading-spinner {
+      border: 4px solid rgba(25, 118, 210, 0.2);
+      border-top: 4px solid #1976D2;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-message {
+      font-size: 1.2rem;
+      color: #546e7a;
+      font-weight: 500;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-bar {
+        padding: 0 1rem;
+      }
+
+      .header-title {
         font-size: 1rem;
-    }
-    #edit-modal .form-group input[type="text"],
-    #edit-modal .form-group input[type="tel"],
-    #edit-modal .form-group textarea,
-    #edit-modal .form-group select {
+      }
+
+      .user-info-display {
+        display: none;
+      }
+
+      .sidebar {
         width: 100%;
-        padding: 0.8rem 1rem;
-        border: 1px solid #cceeff;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        box-sizing: border-box;
-        background-color: #f8fcfd;
-        transition: border-color 0.3s, box-shadow 0.3s;
-        margin-bottom: 0.8rem; /* Space between fields */
+        left: -100%;
+      }
+
+      .container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .filter-section {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .action-buttons button {
+        min-width: 100%;
+      }
     }
-    #edit-modal .form-group input:focus,
-    #edit-modal .form-group textarea:focus,
-    #edit-modal .form-group select:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+
+    @media (min-width: 1200px) {
+      .main-wrapper.sidebar-open {
+        margin-left: 300px;
+      }
     }
-    #edit-modal .form-group textarea {
-      min-height: 80px; /* Smaller textarea for modal */
-      resize: vertical;
+
+    /* Animation Classes */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    #edit-modal .radio-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-        margin-top: 0.5rem;
-        justify-content: flex-start; /* Align radios to start */
+
+    .container {
+      animation: fadeIn 0.6s ease-out;
     }
-    #edit-modal .radio-group label {
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
+
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .sidebar.open {
+      animation: slideIn 0.3s ease-out;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
-  <nav class="topnav">
-    <div class="title"><i class="fas fa-bolt"></i> ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</div>
-    <div class="menu">
-      <a onclick="loadDashboard()"><i class="fas fa-home"></i> หน้าหลัก</a>
-      <a onclick="loadReportRepair()"><i class="fas fa-plus-circle"></i> แจ้งซ่อมใหม่</a>
-      <a class="active" onclick="loadStatus()"><i class="fas fa-tools"></i> จัดการแจ้งซ่อม</a>
-      <a onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+  <!-- Header Bar -->
+  <header class="header-bar">
+    <div class="header-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <i class="fas fa-bolt header-icon"></i>
+      <div class="header-title">ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</div>
+    </div>
+    <div class="header-right">
+      <div class="user-menu">
+        <img src="https://placehold.co/36x36/1976D2/FFFFFF?text=👤" alt="User">
+        <div class="user-info-display">
+          <span class="username" id="loggedInUsername">ผู้ดูแลระบบ</span>
+          <div class="position" id="loggedInUserPosition">เจ้าหน้าที่</div>
+        </div>
+        <div class="dropdown">
+          <a href="#"><i class="fas fa-user-cog"></i> โปรไฟล์</a>
+          <a href="#"><i class="fas fa-cog"></i> ตั้งค่า</a>
+          <a onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Professional Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="fas fa-tools"></i>
+      </div>
+      <div class="title">ระบบจัดการแจ้งซ่อม</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">เมนูหลัก</div>
+        <a onclick="loadDashboard()">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>หน้าหลัก</span>
+        </a>
+        <a onclick="loadReportRepair()">
+          <i class="fas fa-plus-circle"></i>
+          <span>แจ้งซ่อมใหม่</span>
+        </a>
+        <a onclick="loadStatus()" class="active">
+          <i class="fas fa-clipboard-list"></i>
+          <span>จัดการแจ้งซ่อม</span>
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">รายงาน</div>
+        <a href="#">
+          <i class="fas fa-chart-bar"></i>
+          <span>รายงาน</span>
+        </a>
+        <a href="#">
+          <i class="fas fa-chart-pie"></i>
+          <span>สถิติ</span>
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">จัดการระบบ</div>
+        <a href="#">
+          <i class="fas fa-users"></i>
+          <span>จัดการผู้ใช้</span>
+        </a>
+        <a href="#">
+          <i class="fas fa-cogs"></i>
+          <span>ตั้งค่าระบบ</span>
+        </a>
+      </div>
     </div>
   </nav>
 
-  <!-- Main Content Container -->
-  <div class="container">
-    <h1>จัดการแจ้งซ่อม</h1>
-    <p class="subtitle">
-      รายการแจ้งซ่อมทั้งหมดและการจัดการสถานะ
-    </p>
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-    <!-- Filter and Search Section -->
-    <div class="filter-section">
-      <input type="text" id="searchInput" placeholder="ค้นหา รหัส, ชื่อผู้แจ้ง, สถานที่...">
-      <select id="statusFilter">
-        <option value="ทั้งหมด">ทั้งหมด</option>
-        <option value="แจ้งซ่อมแล้ว">แจ้งซ่อมแล้ว</option>
-        <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
-        <option value="เสร็จเรียบร้อย">เสร็จเรียบร้อย</option>
-        <option value="ยกเลิก">ยกเลิก</option>
-      </select>
-      <button onclick="applyFilter()">ค้นหา/กรอง</button>
-      <button onclick="clearFilters()">ล้างตัวกรอง</button>
-    </div>
-
-    <!-- Repair Table Container -->
-    <div class="repair-table-container">
-      <table class="repair-table">
-        <thead>
-          <tr>
-            <th>รหัสแจ้งซ่อม</th>
-            <th>สถานะ</th>
-            <th>ผู้แจ้ง</th>
-            <th>เบอร์โทร</th>
-            <th>ประเภท</th>
-            <th>สถานที่</th>
-            <th>รายละเอียดปัญหา</th>
-            <th>ผู้รับผิดชอบ</th>
-            <th>การดำเนินการ</th>
-          </tr>
-        </thead>
-        <tbody id="repairTableBody">
-          <!-- Data rows will be inserted here by JavaScript -->
-        </tbody>
-      </table>
-      <div id="noDataMessage" style="display: none;">ไม่พบข้อมูลการแจ้งซ่อมที่ตรงกับตัวกรอง</div>
-    </div>
-  </div>
-
-  <!-- Loading Overlay -->
-  <div id="loading-overlay" class="loading-overlay" style="display: none;">
-    <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <p id="loading-message">กำลังโหลดข้อมูล...</p>
-    </div>
-  </div>
-
-  <!-- Custom Modal for messages and repair details -->
-  <div id="custom-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-      <h3 id="modal-title">แจ้งเตือน</h3>
-      <p id="modal-message"></p>
-      <div id="modal-details-content" style="display: none;">
-        <!-- Detailed repair info will be loaded here -->
-        <div class="detail-item"><strong>รหัสแจ้งซ่อม:</strong> <span id="detail-repairId"></span></div>
-        <div class="detail-item"><strong>ประทับเวลา:</strong> <span id="detail-timestamp"></span></div>
-        <div class="detail-item"><strong>สถานะ:</strong> <span id="detail-status"></span></div>
-        <div class="detail-item"><strong>ผู้แจ้ง:</strong> <span id="detail-reporterName"></span></div>
-        <div class="detail-item"><strong>เบอร์โทร:</strong> <span id="detail-phoneNumber"></span></div>
-        <div class="detail-item"><strong>หน่วยงาน:</strong> <span id="detail-department"></span></div>
-        <div class="detail-item"><strong>เลข ปชช.:</strong> <span id="detail-citizenID"></span></div>
-        <div class="detail-item"><strong>สถานที่:</strong> <span id="detail-location"></span></div>
-        <div class="detail-item"><strong>ประเภท:</strong> <span id="detail-repairType"></span></div>
-        <div class="detail-item"><strong>รายละเอียด:</strong> <span id="detail-repairDesc"></span></div>
-        <div class="detail-item"><strong>พิกัด:</strong> <span id="detail-geoCode"></span></div>
-        <div class="detail-item"><strong>ที่อยู่จากพิกัด:</strong> <span id="detail-geoAddress"></span></div>
-        <div class="detail-item"><strong>ผู้รับผิดชอบ:</strong> <span id="detail-assignee"></span></div>
-        <div class="detail-item" id="detail-photo-container" style="display: none;">
-          <strong>รูปภาพ:</strong><br>
-          <img id="detail-photo" src="" alt="ภาพแจ้งซ่อม">
-        </div>
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper" id="mainWrapper">
+    <div class="container">
+      <div class="page-header">
+        <h1><i class="fas fa-clipboard-list" style="margin-right: 1rem; color: #1976D2;"></i>จัดการแจ้งซ่อม</h1>
+        <p class="subtitle">
+          ระบบจัดการรายการแจ้งซ่อมทั้งหมด ตรวจสอบสถานะ และดำเนินการซ่อมแซม
+        </p>
       </div>
-      <div class="button-group-modal" style="margin-top: 1.5rem;">
-        <button class="modal-close-button" onclick="hideModal()">ตกลง</button>
-        <!-- Action buttons for details modal (e.g., Edit, Complete, Delete) -->
-        <button class="primary" id="modalEditBtn" style="display:none;" onclick="openEditModalFromDetail()"><i class="fas fa-edit"></i> แก้ไข</button>
-        <button class="secondary" id="modalCompleteBtn" style="display:none; background-color: #28a745;" onclick="completeRepair()"><i class="fas fa-check"></i> ดำเนินการเสร็จสิ้น</button>
-        <button class="secondary" id="modalCancelBtn" style="display:none; background-color: #dc3545;" onclick="cancelRepair()"><i class="fas fa-times"></i> ยกเลิกการแจ้งซ่อม</button>
+
+      <!-- Professional Filter Section -->
+      <div class="filter-section">
+        <input type="text" id="searchInput" placeholder="🔍 ค้นหา รหัส, ชื่อผู้แจ้ง, สถานที่...">
+        <select id="statusFilter">
+          <option value="ทั้งหมด">📋 ทั้งหมด</option>
+          <option value="แจ้งซ่อมแล้ว">🔄 แจ้งซ่อมแล้ว</option>
+          <option value="กำลังดำเนินการ">⚙️ กำลังดำเนินการ</option>
+          <option value="เสร็จเรียบร้อย">✅ เสร็จเรียบร้อย</option>
+          <option value="ยกเลิก">❌ ยกเลิก</option>
+        </select>
+        <button class="primary" onclick="applyFilter()">
+          <i class="fas fa-search"></i> ค้นหา
+        </button>
+        <button class="secondary" onclick="clearFilters()">
+          <i class="fas fa-eraser"></i> ล้างตัวกรอง
+        </button>
       </div>
-    </div>
-  </div>
 
-  <!-- Edit Repair Modal (Expanded to include more fields) -->
-  <div id="edit-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-      <h3>แก้ไขข้อมูลแจ้งซ่อม</h3>
-      <form id="edit-repair-form">
-        <input type="hidden" id="edit-repairId-hidden">
-        
-        <div class="form-group">
-            <label for="edit-reporterName">ชื่อ-สกุลผู้แจ้ง:</label>
-            <input type="text" id="edit-reporterName" name="reporterName" placeholder="ชื่อ-สกุลผู้แจ้ง">
-        </div>
-        <div class="form-group">
-            <label for="edit-phoneNumber">เบอร์โทรศัพท์:</label>
-            <input type="tel" id="edit-phoneNumber" name="phoneNumber" placeholder="เบอร์โทรศัพท์">
-        </div>
-        <div class="form-group">
-            <label for="edit-department">หน่วยงาน:</label>
-            <input type="text" id="edit-department" name="department" placeholder="หน่วยงานที่สังกัด">
-        </div>
-        <div class="form-group">
-            <label for="edit-citizenID">หมายเลขประจำตัวประชาชน:</label>
-            <input type="text" id="edit-citizenID" name="citizenID" placeholder="13 หลัก" maxlength="13">
-        </div>
-        <div class="form-group">
-            <label for="edit-location">สถานที่เกิดเหตุ:</label>
-            <input type="text" id="edit-location" name="location" placeholder="สถานที่เกิดเหตุ">
-        </div>
-        <div class="form-group">
-            <label for="edit-repairType">ประเภทการแจ้งซ่อม:</label>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="editRepairType" value="ไฟฟ้าสาธารณะ">
-                    <span><i class="fas fa-lightbulb"></i> ไฟฟ้าสาธารณะ</span>
-                </label>
-                <label>
-                    <input type="radio" name="editRepairType" value="ถนน/ทางเท้า">
-                    <span><i class="fas fa-road"></i> ถนน/ทางเท้า</span>
-                </label>
-                <label>
-                    <input type="radio" name="editRepairType" value="น้ำประปา">
-                    <span><i class="fas fa-faucet"></i> น้ำประปา</span>
-                </label>
-                <label>
-                    <input type="radio" name="editRepairType" value="อื่นๆ">
-                    <span><i class="fas fa-ellipsis-h"></i> อื่นๆ</span>
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="edit-repairDesc">รายละเอียดปัญหา:</label>
-            <textarea id="edit-repairDesc" name="repairDesc" placeholder="อธิบายปัญหา" rows="4"></textarea>
-        </div>
-        <div class="form-group">
-            <label for="edit-geoStamp">ประทับเวลาทางภูมิศาสตร์:</label>
-            <input type="text" id="edit-geoStamp" name="geoStamp" placeholder="เช่น 2024-06-27 10:30:00">
-        </div>
-        <div class="form-group">
-            <label for="edit-geoCode">พิกัดทางภูมิศาสตร์ (ละติจูด, ลองจิจูด):</label>
-            <input type="text" id="edit-geoCode" name="geoCode" placeholder="เช่น 13.7563, 100.5018">
-        </div>
-        <div class="form-group">
-            <label for="edit-geoAddress">ที่อยู่จากพิกัด:</label>
-            <input type="text" id="edit-geoAddress" name="geoAddress" placeholder="ที่อยู่แบบเต็ม">
-        </div>
-
-        <div class="form-group">
-            <label for="edit-status">สถานะ:</label>
-            <select id="edit-status" name="status">
-                <option value="แจ้งซ่อมแล้ว">แจ้งซ่อมแล้ว</option>
-                <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
-                <option value="เสร็จเรียบร้อย">เสร็จเรียบร้อย</option>
-                <option value="ยกเลิก">ยกเลิก</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="edit-assignee">ผู้รับผิดชอบ:</label>
-            <input type="text" id="edit-assignee" name="assignee" placeholder="ชื่อผู้รับผิดชอบ">
-        </div>
-        <div class="button-group-modal">
-            <button type="button" class="primary" onclick="saveEditedRepair()"><i class="fas fa-save"></i> บันทึก</button>
-            <button type="button" class="secondary" onclick="hideEditModal()"><i class="fas fa-times-circle"></i> ยกเลิก</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-
-  <script>
-    let allRepairData = []; // Store all data fetched from Apps Script
-    let currentFilterStatus = 'ทั้งหมด'; // Current filter from URL or dropdown
-    let currentSearchTerm = ''; // Current search term
-    let currentDetailRepairId = null; // Store the ID of the repair being viewed in detail modal
-
-    /**
-     * Logs debug messages to the console.
-     * @param {string} message The message to log.
-     */
-    function debugLog(message) {
-      console.log('🔧 STATUS DEBUG:', message);
-    }
-
-    /**
-     * Displays a custom modal dialog with a given message and title.
-     * @param {string} message The message to display.
-     * @param {string} [title='แจ้งเตือน'] The title of the modal.
-     * @param {boolean} [isDetail=false] Whether the modal is showing repair details.
-     * @returns {Promise<void>} A promise that resolves when the modal is closed.
-     */
-    function showModal(message, title = 'แจ้งเตือน', isDetail = false) {
-      return new Promise(resolve => {
-        const modal = document.getElementById('custom-modal');
-        document.getElementById('modal-title').textContent = title;
-        document.getElementById('modal-message').innerHTML = message;
-
-        if (isDetail) {
-          document.getElementById('modal-message').style.display = 'none'; // Hide generic message for details
-          document.getElementById('modal-details-content').style.display = 'block'; // Show detail content
-          document.getElementById('modalEditBtn').style.display = 'inline-block';
-          document.getElementById('modalCompleteBtn').style.display = 'inline-block';
-          document.getElementById('modalCancelBtn').style.display = 'inline-block';
-        } else {
-          document.getElementById('modal-message').style.display = 'block'; // Show generic message
-          document.getElementById('modal-details-content').style.display = 'none'; // Hide detail content
-          document.getElementById('modalEditBtn').style.display = 'none';
-          document.getElementById('modalCompleteBtn').style.display = 'none';
-          document.getElementById('modalCancelBtn').style.display = 'none';
-        }
-        
-        modal.style.display = 'flex';
-        // When closing the modal, hide the action buttons as well
-        document.querySelector('.modal-close-button').onclick = () => {
-          hideModal();
-          resolve();
-        };
-      });
-    }
-
-    /**
-     * Hides the custom modal dialog.
-     */
-    function hideModal() {
-      document.getElementById('custom-modal').style.display = 'none';
-      document.getElementById('modal-details-content').style.display = 'none'; // Ensure hidden on close
-      document.getElementById('modalEditBtn').style.display = 'none'; // Hide action buttons
-      document.getElementById('modalCompleteBtn').style.display = 'none';
-      document.getElementById('modalCancelBtn').style.display = 'none';
-      currentDetailRepairId = null; // Clear the current detail ID
-    }
-
-    /**
-     * Shows the loading overlay.
-     * @param {string} [message='กำลังดำเนินการ...'] The message to display.
-     */
-    function showLoading(message = 'กำลังดำเนินการ...') {
-      document.getElementById('loading-message').textContent = message;
-      document.getElementById('loading-overlay').style.display = 'flex';
-    }
-
-    /**
-     * Hides the loading overlay.
-     */
-    function hideLoading() {
-      document.getElementById('loading-overlay').style.display = 'none';
-    }
-
-    // --- Navigation Functions (re-used from other pages) ---
-    function loadDashboard() {
-      debugLog('loadDashboard called');
-      try {
-        if (typeof google === 'undefined' || !google.script || !google.script.run) throw new Error('Google Apps Script not ready.');
-        showLoading('กำลังโหลดหน้าหลัก...');
-        google.script.run.withSuccessHandler(html => { hideLoading(); document.open(); document.write(html); document.close(); }).withFailureHandler(e => { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + e.message); }).getDashboardPage();
-      } catch (error) { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + error.message); }
-    }
-
-    function loadReportRepair() {
-      debugLog('loadReportRepair called');
-      try {
-        if (typeof google === 'undefined' || !google.script || !google.script.run) throw new Error('Google Apps Script not ready.');
-        showLoading('กำลังโหลดหน้าแจ้งซ่อม...');
-        google.script.run.withSuccessHandler(html => { hideLoading(); document.open(); document.write(html); document.close(); }).withFailureHandler(e => { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + e.message); }).getReportRepairPage();
-      } catch (error) { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + error.message); }
-    }
-
-    function loadStatus() {
-      debugLog('loadStatus called');
-      try {
-        if (typeof google === 'undefined' || !google.script || !google.script.run) throw new Error('Google Apps Script not ready.');
-        showLoading('กำลังโหลดหน้าจัดการแจ้งซ่อม...');
-        google.script.run.withSuccessHandler(html => { hideLoading(); document.open(); document.write(html); document.close(); }).withFailureHandler(e => { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + e.message); }).getStatusPage();
-      } catch (error) { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + error.message); }
-    }
-
-    function logout() {
-      debugLog('logout called');
-      showModal('คุณต้องการออกจากระบบหรือไม่?', 'ยืนยันการออกจากระบบ').then(() => {
-        try {
-          if (typeof google === 'undefined' || !google.script || !google.script.run) throw new Error('Google Apps Script not ready.');
-          showLoading('กำลังออกจากระบบ...');
-          google.script.run.withSuccessHandler(html => { hideLoading(); document.open(); document.write(html); document.close(); }).withFailureHandler(e => { hideLoading(); showModal('เกิดข้อผิดพลาดในการออกจากระบบ: ' + e.message); }).doLogout();
-        } catch (error) { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + error.message); }
-      });
-    }
-
-    // --- Repair Data Management ---
-
-    /**
-     * Fetches repair data from Apps Script, filters it, and displays it in the table.
-     */
-    async function fetchRepairData() {
-      debugLog('fetchRepairData called');
-      showLoading('กำลังดึงข้อมูลการแจ้งซ่อม...');
-      try {
-        if (typeof google === 'undefined' || !google.script || !google.script.run) {
-          throw new Error('Google Apps Script environment is not ready.');
-        }
-
-        const data = await google.script.run.withSuccessHandler(res => {
-          allRepairData = res; // Store all fetched data
-          applyFilter(); // Apply current filters after data is loaded
-          hideLoading();
-          debugLog('Repair data fetched successfully. Total items: ' + allRepairData.length);
-        }).withFailureHandler(e => {
-          hideLoading();
-          showModal('ไม่สามารถดึงข้อมูลการแจ้งซ่อมได้: ' + e.message, 'ข้อผิดพลาดข้อมูล');
-          debugLog('Failed to fetch repair data: ' + e.message);
-          renderTable([]); // Render empty table on failure
-        }).getRepairData(); // Calls getRepairData from Code.gs
-      } catch (error) {
-        hideLoading();
-        showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
-        debugLog('Error in fetchRepairData: ' + error.message);
-      }
-    }
-
-    /**
-     * Filters the repair data based on search term and status, then renders the table.
-     */
-    function applyFilter() {
-      debugLog('applyFilter called');
-      currentSearchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-      currentFilterStatus = document.getElementById('statusFilter').value;
-
-      const filteredData = allRepairData.filter(item => {
-        const matchesSearch = currentSearchTerm === '' ||
-                              String(item['รหัสแจ้งซ่อม']).toLowerCase().includes(currentSearchTerm) ||
-                              String(item['ชื่อผู้แจ้ง']).toLowerCase().includes(currentSearchTerm) ||
-                              String(item['สถานที่เกิดเหตุ']).toLowerCase().includes(currentSearchTerm) ||
-                              String(item['รายละเอียดปัญหา']).toLowerCase().includes(currentSearchTerm);
-        
-        const matchesStatus = currentFilterStatus === 'ทั้งหมด' ||
-                              String(item['สถานะ']).trim() === currentFilterStatus;
-        
-        return matchesSearch && matchesStatus;
-      });
-
-      renderTable(filteredData);
-      debugLog(`Filter applied: Search "${currentSearchTerm}", Status "${currentFilterStatus}". Displaying ${filteredData.length} items.`);
-    }
-
-    /**
-     * Clears the search and status filters and re-renders the table.
-     */
-    function clearFilters() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('statusFilter').value = 'ทั้งหมด';
-      applyFilter();
-      debugLog('Filters cleared.');
-    }
-
-    /**
-     * Renders the provided repair data into the HTML table.
-     * @param {Array<Object>} dataToRender The array of repair data objects to display.
-     */
-    function renderTable(dataToRender) {
-      const tableBody = document.getElementById('repairTableBody');
-      tableBody.innerHTML = ''; // Clear existing rows
-      const noDataMessage = document.getElementById('noDataMessage');
-
-      if (dataToRender.length === 0) {
-        noDataMessage.style.display = 'block';
-        return;
-      } else {
-        noDataMessage.style.display = 'none';
-      }
-
-      dataToRender.forEach(item => {
-        const row = tableBody.insertRow();
-        row.dataset.repairId = item['รหัสแจ้งซ่อม']; // Store ID for actions
-
-        // Determine status badge class
-        let statusClass = '';
-        switch (item['สถานะ']) {
-          case 'แจ้งซ่อมแล้ว': statusClass = 'reported'; break;
-          case 'กำลังดำเนินการ': statusClass = 'in-progress'; break;
-          case 'เสร็จเรียบร้อย': statusClass = 'completed'; break;
-          case 'ยกเลิก': statusClass = 'cancelled'; break;
-          default: statusClass = ''; break;
-        }
-
-        // --- FIX: Ensure 'รายละเอียดปัญหา' is a string before calling substring ---
-        const truncatedDescription = String(item['รายละเอียดปัญหา'] || '').substring(0, 50) + '...';
-
-        row.innerHTML = `
-          <td>${item['รหัสแจ้งซ่อม'] || ''}</td>
-          <td><span class="status-badge ${statusClass}">${item['สถานะ'] || ''}</span></td>
-          <td>${item['ชื่อผู้แจ้ง'] || ''}</td>
-          <td>${item['เบอร์โทรศัพท์'] || ''}</td>
-          <td>${item['ประเภทการแจ้งซ่อม'] || ''}</td>
-          <td>${item['สถานที่เกิดเหตุ'] || ''}</td>
-          <td>${truncatedDescription}</td>
-          <td>${item['ผู้รับผิดชอบ'] || '-'}</td>
-          <td class="action-buttons">
-            <button class="view" onclick="viewRepairDetails('${item['รหัสแจ้งซ่อม']}')"><i class="fas fa-eye"></i> ดู</button>
-            <button class="edit" onclick="openEditModal('${item['รหัสแจ้งซ่อม']}')"><i class="fas fa-edit"></i> แก้ไข</button>
-            <button class="delete" onclick="confirmDelete('${item['รหัสแจ้งซ่อม']}')"><i class="fas fa-trash-alt"></i> ลบ</button>
-          </td>
-        `;
-      });
-      debugLog(`Table rendered with ${dataToRender.length} items.`);
-    }
-
-    /**
-     * Opens a modal to display detailed information of a repair request.
-     * @param {string} repairId The ID of the repair request to view.
-     */
-    async function viewRepairDetails(repairId) {
-      debugLog('viewRepairDetails called for ID: ' + repairId);
-      currentDetailRepairId = repairId; // Store the ID for modal action buttons
-      showLoading('กำลังดึงรายละเอียด...');
-      try {
-        if (typeof google === 'undefined' || !google.script || !google.script.run) {
-          throw new Error('Google Apps Script environment is not ready.');
-        }
-
-        const detail = await google.script.run.withSuccessHandler(res => {
-          hideLoading();
-          if (res) {
-            document.getElementById('detail-repairId').textContent = res['รหัสแจ้งซ่อม'] || '-';
-            document.getElementById('detail-timestamp').textContent = res['ประทับเวลา'] || '-';
-            document.getElementById('detail-status').textContent = res['สถานะ'] || '-';
-            document.getElementById('detail-reporterName').textContent = res['ชื่อผู้แจ้ง'] || '-';
-            document.getElementById('detail-phoneNumber').textContent = res['เบอร์โทรศัพท์'] || '-';
-            document.getElementById('detail-department').textContent = res['หน่วยงาน'] || '-';
-            document.getElementById('detail-citizenID').textContent = res['หมายเลขประจำตัวประชาชน'] || '-';
-            document.getElementById('detail-location').textContent = res['สถานที่เกิดเหตุ'] || '-';
-            document.getElementById('detail-repairType').textContent = res['ประเภทการแจ้งซ่อม'] || '-';
-            document.getElementById('detail-repairDesc').textContent = res['รายละเอียดปัญหา'] || '-';
-            document.getElementById('detail-geoCode').textContent = res['GeoCode'] || '-';
-            document.getElementById('detail-geoAddress').textContent = res['GeoAddress'] || '-';
-            document.getElementById('detail-assignee').textContent = res['ผู้รับผิดชอบ'] || '-';
-
-            const photoContainer = document.getElementById('detail-photo-container');
-            const photoImg = document.getElementById('detail-photo');
-            if (res['PhotoUrl']) {
-              photoImg.src = res['PhotoUrl'];
-              photoContainer.style.display = 'block';
-            } else {
-              photoImg.src = '';
-              photoContainer.style.display = 'none';
-            }
-            
-            // Set repairId for modal action buttons (using currentDetailRepairId)
-            // Buttons will use currentDetailRepairId directly now
-
-            // Adjust visibility of complete/cancel buttons based on status
-            const currentStatus = res['สถานะ'];
-            if (currentStatus === 'เสร็จเรียบร้อย' || currentStatus === 'ยกเลิก') {
-              document.getElementById('modalCompleteBtn').style.display = 'none';
-              document.getElementById('modalCancelBtn').style.display = 'none';
-            } else {
-              document.getElementById('modalCompleteBtn').style.display = 'inline-block';
-              document.getElementById('modalCancelBtn').style.display = 'inline-block';
-            }
-
-            showModal('', 'รายละเอียดการแจ้งซ่อม', true); // Show detail modal
-            debugLog('Repair details loaded and displayed for ID: ' + repairId);
-
-          } else {
-            showModal('ไม่พบรายละเอียดสำหรับรหัสแจ้งซ่อมนี้', 'ไม่พบข้อมูล');
-          }
-        }).withFailureHandler(e => {
-          hideLoading();
-          showModal('ไม่สามารถดึงรายละเอียดการแจ้งซ่อมได้: ' + e.message, 'ข้อผิดพลาด');
-          debugLog('Failed to fetch repair details: ' + e.message);
-        }).getRepairDetails(repairId); // Calls getRepairDetails from Code.gs
-      } catch (error) {
-        hideLoading();
-        showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
-        debugLog('Error in viewRepairDetails: ' + error.message);
-      }
-    }
-
-    /**
-     * Opens the edit modal from the table row.
-     * @param {string} repairId The ID of the repair to edit.
-     */
-    async function openEditModal(repairId) {
-        debugLog('openEditModal called for ID: ' + repairId);
-        showLoading('กำลังโหลดข้อมูลแก้ไข...');
-        try {
-            const detail = await google.script.run.withSuccessHandler(res => {
-                hideLoading();
-                if (res) {
-                    document.getElementById('edit-repairId-hidden').value = repairId;
-                    // Populate all editable fields
-                    document.getElementById('edit-reporterName').value = res['ชื่อผู้แจ้ง'] || '';
-                    document.getElementById('edit-phoneNumber').value = res['เบอร์โทรศัพท์'] || '';
-                    document.getElementById('edit-department').value = res['หน่วยงาน'] || '';
-                    document.getElementById('edit-citizenID').value = res['หมายเลขประจำตัวประชาชน'] || '';
-                    document.getElementById('edit-location').value = res['สถานที่เกิดเหตุ'] || '';
-                    document.getElementById('edit-repairDesc').value = res['รายละเอียดปัญหา'] || '';
-                    document.getElementById('edit-geoStamp').value = res['GeoStamp'] || '';
-                    document.getElementById('edit-geoCode').value = res['GeoCode'] || '';
-                    document.getElementById('edit-geoAddress').value = res['GeoAddress'] || '';
-                    
-                    // Set radio button for repair type
-                    const repairTypeRadios = document.querySelectorAll('input[name="editRepairType"]');
-                    repairTypeRadios.forEach(radio => {
-                        if (radio.value === res['ประเภทการแจ้งซ่อม']) {
-                            radio.checked = true;
-                        } else {
-                            radio.checked = false; // Ensure others are unchecked
-                        }
-                    });
-
-                    document.getElementById('edit-status').value = res['สถานะ'] || 'แจ้งซ่อมแล้ว';
-                    document.getElementById('edit-assignee').value = res['ผู้รับผิดชอบ'] || '';
-                    
-                    document.getElementById('edit-modal').style.display = 'flex';
-                    debugLog('Edit modal opened for ID: ' + repairId);
-                } else {
-                    showModal('ไม่พบข้อมูลสำหรับแก้ไข', 'ข้อผิดพลาด');
-                }
-            }).withFailureHandler(e => {
-                hideLoading();
-                showModal('ไม่สามารถดึงข้อมูลสำหรับแก้ไขได้: ' + e.message, 'ข้อผิดพลาด');
-            }).getRepairDetails(repairId);
-        } catch (error) {
-            hideLoading();
-            showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
-        }
-    }
-    
-    /**
-     * Opens the edit modal directly from the detail view modal.
-     * It uses the `currentDetailRepairId` global variable.
-     */
-    function openEditModalFromDetail() {
-        if (currentDetailRepairId) {
-            hideModal(); // Hide the detail modal first
-            openEditModal(currentDetailRepairId); // Open edit modal using the stored ID
-        } else {
-            showModal('ไม่พบรายการแจ้งซ่อมที่เลือกสำหรับแก้ไข', 'ข้อผิดพลาด');
-        }
-    }
-
-
-    /**
-     * Hides the edit modal.
-     */
-    function hideEditModal() {
-      document.getElementById('edit-modal').style.display = 'none';
-      debugLog('Edit modal closed.');
-    }
-
-    /**
-     * Saves the edited repair data.
-     */
-    async function saveEditedRepair() {
-      debugLog('saveEditedRepair called');
-      const repairId = document.getElementById('edit-repairId-hidden').value;
-      
-      // Collect all data from the edit modal
-      const updatedData = {
-          'ชื่อผู้แจ้ง': document.getElementById('edit-reporterName').value.trim(),
-          'เบอร์โทรศัพท์': document.getElementById('edit-phoneNumber').value.trim(),
-          'หน่วยงาน': document.getElementById('edit-department').value.trim(),
-          'หมายเลขประจำตัวประชาชน': document.getElementById('edit-citizenID').value.trim(),
-          'สถานที่เกิดเหตุ': document.getElementById('edit-location').value.trim(),
-          'ประเภทการแจ้งซ่อม': document.querySelector('input[name="editRepairType"]:checked')?.value || '', // Get selected radio value
-          'รายละเอียดปัญหา': document.getElementById('edit-repairDesc').value.trim(),
-          'GeoStamp': document.getElementById('edit-geoStamp').value.trim(),
-          'GeoCode': document.getElementById('edit-geoCode').value.trim(),
-          'GeoAddress': document.getElementById('edit-geoAddress').value.trim(),
-          'สถานะ': document.getElementById('edit-status').value,
-          'ผู้รับผิดชอบ': document.getElementById('edit-assignee').value.trim()
-      };
-
-      // Basic validation for required fields in edit modal
-      if (!updatedData['ชื่อผู้แจ้ง'] || !updatedData['เบอร์โทรศัพท์'] || !updatedData['สถานที่เกิดเหตุ'] || !updatedData['ประเภทการแจ้งซ่อม'] || !updatedData['รายละเอียดปัญหา']) {
-        showModal('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วนในฟอร์มแก้ไข', 'ข้อมูลไม่ครบถ้วน');
-        return;
-      }
-      if (!/^[0-9]{10,12}$/.test(updatedData['เบอร์โทรศัพท์'].replace(/[-\s]/g, ''))) {
-        showModal('รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง (ต้องเป็นตัวเลข 10-12 หลัก)', 'ข้อมูลไม่ถูกต้อง');
-        return;
-      }
-      if (updatedData['หมายเลขประจำตัวประชาชน'] && !/^[0-9]{13}$/.test(updatedData['หมายเลขประจำตัวประชาชน'])) {
-        showModal('หมายเลขประจำตัวประชาชนต้องเป็นตัวเลข 13 หลัก', 'ข้อมูลไม่ถูกต้อง');
-        return;
-      }
-      
-      showLoading('กำลังบันทึกข้อมูล...');
-      try {
-        if (typeof google === 'undefined' || !google.script || !google.script.run) {
-          throw new Error('Google Apps Script environment is not ready.');
-        }
-
-        await google.script.run.withSuccessHandler(() => {
-          hideLoading();
-          hideEditModal();
-          showModal('บันทึกการแก้ไขสำเร็จ!', 'สำเร็จ').then(() => {
-            fetchRepairData(); // Refresh table
-          });
-          debugLog('Repair updated successfully for ID: ' + repairId);
-        }).withFailureHandler(e => {
-          hideLoading();
-          showModal('เกิดข้อผิดพลาดในการบันทึก: ' + e.message, 'ข้อผิดพลาด');
-          debugLog('Failed to save edited repair: ' + e.message);
-        }).updateRepair(repairId, updatedData); // Pass all updatedData to Code.gs
-      } catch (error) {
-        hideLoading();
-        showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
-        debugLog('Error in saveEditedRepair: ' + error.message);
-      }
-    }
-
-    /**
-     * Marks a repair as 'เสร็จเรียบร้อย'.
-     */
-    async function completeRepair() {
-      const repairId = currentDetailRepairId; // Use the stored ID
-      if (!repairId) {
-          showModal('ไม่พบรายการแจ้งซ่อมที่เลือก', 'ข้อผิดพลาด');
-          return;
-      }
-      debugLog('completeRepair called for ID: ' + repairId);
-      showModal('คุณต้องการเปลี่ยนสถานะเป็น "เสร็จเรียบร้อย" ใช่หรือไม่?', 'ยืนยันการดำเนินการ').then(async () => {
-        showLoading('กำลังอัปเดตสถานะ...');
-        try {
-          if (typeof google === 'undefined' || !google.script || !google.script.run) throw new Error('Google Apps Script not ready.');
-          await google.script.run.withSuccessHandler(() => {
-            hideLoading();
-            hideModal(); // Close detail modal
-            showModal('สถานะอัปเดตเป็น "เสร็จเรียบร้อย"!', 'สำเร็จ').then(() => fetchRepairData());
-            debugLog('Repair status set to "Completed" for ID: ' + repairId);
-          }).withFailureHandler(e => {
-            hideLoading(); showModal('ไม่สามารถอัปเดตสถานะได้: ' + e.message, 'ข้อผิดพลาด'); debugLog('Failed to complete repair: ' + e.message);
-          }).updateRepair(repairId, { 'สถานะ': 'เสร็จเรียบร้อย' });
-        } catch (error) { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด'); debugLog('Error in completeRepair: ' + error.message); }
-      });
-    }
-
-    /**
-     * Marks a repair as 'ยกเลิก'.
-     */
-    async function cancelRepair() {
-      const repairId = currentDetailRepairId; // Use the stored ID
-      if (!repairId) {
-          showModal('ไม่พบรายการแจ้งซ่อมที่เลือก', 'ข้อผิดพลาด');
-          return;
-      }
-      debugLog('cancelRepair called for ID: ' + repairId);
-      showModal('คุณต้องการ "ยกเลิก" การแจ้งซ่อมนี้ใช่หรือไม่?', 'ยืนยันการยกเลิก').then(async () => {
-        showLoading('กำลังอัปเดตสถานะ...');
-        try {
-          if (typeof google === 'undefined' || !google.script || !google.script.run) throw new Error('Google Apps Script not ready.');
-          await google.script.run.withSuccessHandler(() => {
-            hideLoading();
-            hideModal(); // Close detail modal
-            showModal('การแจ้งซ่อมถูก "ยกเลิก" แล้ว!', 'สำเร็จ').then(() => fetchRepairData());
-            debugLog('Repair status set to "Cancelled" for ID: ' + repairId);
-          }).withFailureHandler(e => {
-            hideLoading(); showModal('ไม่สามารถยกเลิกการแจ้งซ่อมได้: ' + e.message, 'ข้อผิดพลาด'); debugLog('Failed to cancel repair: ' + e.message);
-          }).updateRepair(repairId, { 'สถานะ': 'ยกเลิก' });
-        } catch (error) { hideLoading(); showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด'); debugLog('Error in cancelRepair: ' + error.message); }
-      });
-    }
-
-
-    /**
-     * Confirms deletion of a repair request and calls Apps Script to delete.
-     * @param {string} repairId The ID of the repair to delete.
-     */
-    function confirmDelete(repairId) {
-      debugLog('confirmDelete called for ID: ' + repairId);
-      showModal('คุณแน่ใจหรือไม่ที่จะลบรายการแจ้งซ่อมนี้? การดำเนินการนี้ไม่สามารถย้อนกลับได้', 'ยืนยันการลบ').then(async () => {
-        showLoading('กำลังลบข้อมูล...');
-        try {
-          if (typeof google === 'undefined' || !google.script || !google.script.run) {
-            throw new Error('Google Apps Script environment is not ready.');
-          }
-
-          await google.script.run.withSuccessHandler(() => {
-            hideLoading();
-            hideModal();
-            showModal('ลบรายการแจ้งซ่อมสำเร็จ!', 'สำเร็จ').then(() => {
-              fetchRepairData(); // Refresh table after deletion
-            });
-            debugLog('Repair deleted successfully for ID: ' + repairId);
-          }).withFailureHandler(e => {
-            hideLoading();
-            showModal('เกิดข้อผิดพลาดในการลบ: ' + e.message, 'ข้อผิดพลาด');
-            debugLog('Failed to delete repair: ' + e.message);
-          }).deleteRepair(repairId); // Calls deleteRepair from Code.gs
-        } catch (error) {
-          hideLoading();
-          showModal('เกิดข้อผิดพลาด: ' + error.message, 'ข้อผิดพลาด');
-          debugLog('Error in confirmDelete: ' + error.message);
-        }
-      });
-    }
-
-    // --- Page Initialization ---
-
-    /**
-     * Initializes the page by checking for Google Apps Script availability
-     * and fetching data. Also handles URL query parameters for filtering.
-     */
-    document.addEventListener('DOMContentLoaded', function() {
-      debugLog('Status page loaded, initializing...');
-      
-      let attempts = 0;
-      const maxAttempts = 10;
-      
-      function checkGoogleScript() {
-        attempts++;
-        debugLog('Checking Google Apps Script availability, attempt: ' + attempts);
-        
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-          debugLog('Google Apps Script is ready for status page.');
-          
-          // --- Read filter status from URL ---
-          const urlParams = new URLSearchParams(window.location.search);
-          const filterStatusFromUrl = urlParams.get('filterStatus');
-          if (filterStatusFromUrl) {
-            debugLog('Filter status found in URL: ' + filterStatusFromUrl);
-            const statusSelect = document.getElementById('statusFilter');
-            // Ensure the value exists in the dropdown before setting
-            if (Array.from(statusSelect.options).some(option => option.value === filterStatusFromUrl)) {
-                statusSelect.value = filterStatusFromUrl;
-                currentFilterStatus = filterStatusFromUrl; // Set current filter
-            } else {
-                debugLog('Filter status from URL not found in dropdown options, defaulting to "ทั้งหมด".');
-                statusSelect.value = 'ทั้งหมด';
-                currentFilterStatus = 'ทั้งหมด';
-            }
-          } else {
-            debugLog('No filter status found in URL, defaulting to "ทั้งหมด".');
-            document.getElementById('statusFilter').value = 'ทั้งหมด';
-            currentFilterStatus = 'ทั้งหมด';
-          }
-
-          // Fetch and display data
-          fetchRepairData();
-
-          // Add event listeners for filter/search
-          document.getElementById('searchInput').addEventListener('keyup', applyFilter);
-          document.getElementById('statusFilter').addEventListener('change', applyFilter);
-
-
-        } else if (attempts < maxAttempts) {
-          debugLog('Google Apps Script not ready yet, retrying in 500ms...');
-          setTimeout(checkGoogleScript, 500);
-        } else {
-          debugLog('Google Apps Script failed to load after ' + maxAttempts + ' attempts for status page.');
-          showModal('ระบบไม่สามารถโหลด Google Apps Script ได้<br><br>กรุณา:<br>1. ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต<br>2. ปิด Ad Blocker (ถ้ามี)<br>3. รีเฟรชหน้าเว็บ', 'ไม่สามารถโหลดระบบได้');
-        }
-      }
-      
-      checkGoogleScript();
-    });
-
-    // Global error handler
-    window.addEventListener('error', function(e) {
-      debugLog('Global error on status page: ' + (e.error?.message || e.message));
-      console.error('Global error on status page:', e);
-    });
-  </script>
-
-</body>
-</html>
+      <!-- Professional Repair Table -->
+      <div class="repair-table-container">
+        <table class="repair-table">
+          <thead>
+            <tr>
+              <th><i class="fas fa-hashtag"></i> รหัสแจ้งซ่อม</th>
+              <th><i class="fas fa-info-circle"></i> สถานะ</th>
+              <th><i class="fas fa-user"></i> ผู้แจ้ง</th>
+              <th><i class="fas fa-phone"></i> เบอร์โทร</th>
+              <th><i class="fas fa-tools"></i> ประเภท</th>
+              <th><i class="fas fa-map-marker-alt"></i> สถานที่</th>
+              <th><i class="fas fa-file-alt"></i> รายละเอียด</th>
+              <th><i class="fas fa-user-tie"></i> ผู้รับผิดชอบ</th>
+              <th><i class="fas fa-cogs"></i> การดำเนินการ</th>
+            </tr>
+          </thead>
+          <tbody id="repairTableBody">
+            <!-- Sample Data -->
+            <tr>
+              <td><strong>REP-2025-001</strong></td>
+              <td><span class="status-badge reported"><i class="fas fa-clock"></i> แจ้งซ่อมแล้ว</span></td>

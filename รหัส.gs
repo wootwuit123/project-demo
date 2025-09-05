@@ -1,21 +1,19 @@
-// ==== Code.gs (แก้ไขแล้ว) ====
-const SS_ID = '1LGbi8jQsritWZ5MrCtZV8Uh1xR9k05EvrwULIg4kKo4';
-const USERS_SHEET_NAME = 'ชีต1'; // Sheet for user data
-const REPAIRS_SHEET_NAME = 'Repairs'; // New sheet for repair request data
+// ==== Code.gs (แก้ไขแล้ว - รวมและแก้ไข) ====
+const SS_ID = '1LW4J9GuP0IQbdYWOD45g1vQltVEnzrTh1vweRfHVm7E';
+const USERS_SHEET_NAME = 'ลงทะเบียนหน้าเว็บ'; // Sheet for user data
+const REPAIRS_SHEET_NAME = 'การตอบแบบฟอร์ม 1'; // Sheet for repair request data
 const LOGIN_STATUS_KEY = 'loggedInUser'; // Key for login status in Cache
 
 // ✅ เพิ่ม: Standard Status Values
 const VALID_STATUSES = {
   REPORTED: 'แจ้งซ่อมแล้ว',
-  IN_PROGRESS: 'กำลังดำเนินการ', 
+  IN_PROGRESS: 'กำลังดำเนินการ',
   COMPLETED: 'เสร็จเรียบร้อย',
   CANCELLED: 'ยกเลิก'
 };
 
 /**
  * Includes HTML/CSS files from style.html.
- * @param {string} filename The name of the file to include.
- * @returns {string} The content of the file.
  */
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
@@ -23,35 +21,30 @@ function include(filename) {
 
 /**
  * Opens the Web App, handling page routing based on login status and URL parameters.
- * @param {Object} e The event object containing URL parameters.
- * @returns {HtmlOutput} The HTML service output for the requested page.
  */
 function doGet(e) {
   const cache = CacheService.getUserCache();
-  const loggedInUser = cache.get(LOGIN_STATUS_KEY); // Check login status
+  const loggedInUser = cache.get(LOGIN_STATUS_KEY);
 
   if (loggedInUser) {
-    // If logged in, check 'page' parameter
     const page = e.parameter.page;
     if (page === 'Status') {
       return HtmlService
         .createTemplateFromFile('status')
         .evaluate()
-        .setTitle('สถานะ & จัดการแจ้งซ่อม'); // Updated title
+        .setTitle('สถานะ & จัดการแจ้งซ่อม');
     } else if (page === 'ReportRepair') {
       return HtmlService
         .createTemplateFromFile('report_repair')
         .evaluate()
         .setTitle('แจ้งซ่อมใหม่');
     } else {
-      // If no 'page' parameter or invalid value, go to Dashboard
       return HtmlService
         .createTemplateFromFile('Dashboard')
         .evaluate()
         .setTitle('Dashboard');
     }
   } else {
-    // If not logged in, go to Login page (index.html)
     return HtmlService
       .createTemplateFromFile('index')
       .evaluate()
@@ -61,7 +54,6 @@ function doGet(e) {
 
 /**
  * Returns the HTML content for the registration page.
- * @returns {string} HTML content for registration.
  */
 function getRegistrationPage() {
   return HtmlService.createTemplateFromFile('registration').evaluate().getContent();
@@ -69,18 +61,15 @@ function getRegistrationPage() {
 
 /**
  * Returns the HTML content for the login page and clears login status from cache.
- * @returns {string} HTML content for login.
  */
 function getLoginPage() {
   const cache = CacheService.getUserCache();
-  cache.remove(LOGIN_STATUS_KEY); // Clear login status when navigating to login page
+  cache.remove(LOGIN_STATUS_KEY);
   return HtmlService.createTemplateFromFile('index').evaluate().getContent();
 }
 
 /**
  * Returns the HTML content for the dashboard (menu) page, checking login status.
- * @returns {string} HTML content for dashboard.
- * @throws {Error} If the user is not logged in.
  */
 function getMenuPage() {
   const cache = CacheService.getUserCache();
@@ -94,8 +83,6 @@ function getMenuPage() {
 
 /**
  * Returns the HTML content for the repair status page, checking login status.
- * @returns {string} HTML content for repair status.
- * @throws {Error} If the user is not logged in.
  */
 function getStatusPage() {
   const cache = CacheService.getUserCache();
@@ -109,8 +96,6 @@ function getStatusPage() {
 
 /**
  * Returns the HTML content for the new repair request page, checking login status.
- * @returns {string} HTML content for new repair request.
- * @throws {Error} If the user is not logged in.
  */
 function getReportRepairPage() {
   const cache = CacheService.getUserCache();
@@ -133,26 +118,21 @@ function hashPassword(password) {
 // ✅ เพิ่ม: Data validation functions
 function validatePhoneNumber(phone) {
   if (!phone) return false;
-  // Accept both formats: 0812345678 or 16299006464
   return /^[0-9]{10,12}$/.test(phone.replace(/[-\s]/g, ''));
 }
 
 function validateEmail(email) {
-  if (!email) return true; // Email is optional
+  if (!email) return true;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function validateCitizenId(id) {
-  if (!id) return true; // Citizen ID is optional
+  if (!id) return true;
   return /^[0-9]{13}$/.test(id);
 }
 
 /**
- * ✅ แก้ไข: Checks username and password against the user data sheet (columns D/E).
- * @param {string} username The username to check.
- * @param {string} password The password to check.
- * @returns {boolean} True if authentication is successful, false otherwise.
- * @throws {Error} If username/password are missing or sheet is not found/empty.
+ * Checks username and password against the user data sheet.
  */
 function checkLogin(username, password) {
   if (!username || !password) {
@@ -167,150 +147,98 @@ function checkLogin(username, password) {
     throw new Error('ไม่พบข้อมูลผู้ใช้ในระบบ');
   }
 
-  // Get only columns D and E
-  const creds = sheet.getRange(2, 4, lastRow - 1, 2).getValues();
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const usernameColIndex = headers.indexOf('Username');
+  const passwordColIndex = headers.indexOf('Password');
+
+  if (usernameColIndex === -1 || passwordColIndex === -1) {
+    throw new Error('ไม่พบข้อมูลคอลัมน์ชื่อผู้ใช้หรือรหัสผ่านในชีท');
+  }
   
-  // ✅ เพิ่ม: Support both hashed and plain text passwords (for backward compatibility)
+  const allData = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
   const hashedPassword = hashPassword(password);
-  
-  const isAuthenticated = creds.some(r => {
-    const storedUsername = String(r[0]).trim();
-    const storedPassword = String(r[1]).trim();
-    
-    return storedUsername === username && 
+
+  const isAuthenticated = allData.some(r => {
+    const storedUsername = String(r[usernameColIndex]).trim();
+    const storedPassword = String(r[passwordColIndex]).trim();
+
+    return storedUsername === username &&
            (storedPassword === password || storedPassword === hashedPassword);
   });
 
   if (isAuthenticated) {
-    // If login is successful, store login status in CacheService
     const cache = CacheService.getUserCache();
-    cache.put(LOGIN_STATUS_KEY, username, 21600); // ✅ เพิ่มเป็น 6 ชั่วโมง (21600 วินาที)
+    cache.put(LOGIN_STATUS_KEY, username, 21600); // 6 hours
   }
   return isAuthenticated;
 }
 
 /**
- * ✅ แก้ไข: Registers a new user with improved validation and password hashing
- * @param {string} fullname User's full name.
- * @param {string} phone User's phone number.
- * @param {string} email User's email address.
- * @param {string} username User's chosen username.
- * @param {string} password User's chosen password.
- * @param {string} position User's position.
- * @returns {boolean} True if registration is successful.
- * @throws {Error} If any field is missing or validation fails.
+ * Registers a new user with improved validation and password hashing
  */
 function registerNewUser(fullname, phone, email, username, password, position) {
-  // ✅ เพิ่ม: Enhanced validation
   if (![fullname, phone, username, password, position].every(v => v && v.toString().trim() !== '')) {
     throw new Error('กรุณากรอกข้อมูลที่จำเป็นให้ครบ: ชื่อเต็ม, เบอร์โทร, ชื่อผู้ใช้, รหัสผ่าน, ตำแหน่ง');
   }
-  
-  // Validate phone number
+
   if (!validatePhoneNumber(phone)) {
     throw new Error('รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง (ต้องเป็นตัวเลข 10-12 หลัก)');
   }
-  
-  // Validate email if provided
+
   if (email && !validateEmail(email)) {
     throw new Error('รูปแบบอีเมลไม่ถูกต้อง');
   }
 
   const ss = SpreadsheetApp.openById(SS_ID);
   let sheet = ss.getSheetByName(USERS_SHEET_NAME);
-  
-  // Create sheet + header if it doesn't exist
+
   if (!sheet) {
     sheet = ss.insertSheet(USERS_SHEET_NAME);
-    sheet.appendRow(['FullName','Phone','Email','Username','Password','Position']);
+    sheet.appendRow(['FullName', 'Phone', 'Email', 'Username', 'Password', 'Position']);
   }
-  
-  // Check for duplicate username
-  const existing = sheet.getRange(2, 4, Math.max(1, sheet.getLastRow() - 1), 1)
-                        .getValues()
-                        .flat();
-  if (existing.includes(username)) {
-    throw new Error('Username นี้มีในระบบแล้ว');
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const usernameColIndex = headers.indexOf('Username');
+
+  if (usernameColIndex === -1) {
+    throw new Error('ไม่พบหัวข้อคอลัมน์ "Username" ในชีทผู้ใช้งาน');
   }
-  
-  // ✅ แก้ไข: Hash password before saving
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    const existingUsernames = sheet.getRange(2, usernameColIndex + 1, lastRow - 1, 1).getValues().flat();
+    if (existingUsernames.includes(username)) {
+      throw new Error('Username นี้มีในระบบแล้ว');
+    }
+  }
+
   const hashedPassword = hashPassword(password);
-  
-  // Save new data
   sheet.appendRow([fullname, phone, email || '', username, hashedPassword, position]);
   return true;
 }
 
 /**
  * Logs out the current user by clearing the login status from cache.
- * @returns {string} The HTML content for the login page after logout.
  */
 function doLogout() {
   const cache = CacheService.getUserCache();
   cache.remove(LOGIN_STATUS_KEY);
-  return getLoginPage(); // Return to Login page after logout
+  return getLoginPage();
 }
 
 /**
- * Calls Gemini API to enhance repair description.
- * @param {string} initialDescription The initial description provided by the user.
- * @returns {string} The enhanced description from AI.
- * @throws {Error} If there's an issue with the API call or response.
- */
-async function enhanceRepairDescription(initialDescription) {
-  const apiKey = ""; // API Key will be provided by Canvas at runtime
-  const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
-
-  // Prompt for Gemini
-  const prompt = `คุณได้รับคำแจ้งซ่อมเบื้องต้นดังนี้: "${initialDescription}" กรุณาขยายความหรืออธิบายรายละเอียดของปัญหาให้ครบถ้วนและชัดเจนยิ่งขึ้น โดยเน้นข้อมูลที่จำเป็นสำหรับการซ่อมแซม เช่น ตำแหน่งที่แน่นอน ลักษณะความเสียหาย อาการที่พบ และข้อมูลอื่นๆ ที่ช่างอาจต้องการ ไม่ต้องสรุป ให้เขียนเป็นรายละเอียดเพิ่มเติม`;
-
-  const payload = {
-    contents: [{ role: "user", parts: [{ text: prompt }] }]
-  };
-
-  const options = {
-    method: 'POST',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-
-  try {
-    const response = UrlFetchApp.fetch(apiUrl, options);
-    const result = JSON.parse(response.getContentText());
-
-    if (result.candidates && result.candidates.length > 0 &&
-        result.candidates[0].content && result.candidates[0].content.parts &&
-        result.candidates[0].content.parts.length > 0) {
-      return result.candidates[0].content.parts[0].text;
-    } else {
-      console.error("Gemini API response structure unexpected:", result);
-      throw new Error("ไม่สามารถปรับปรุงรายละเอียดได้: โครงสร้างการตอบกลับจาก AI ไม่ถูกต้อง");
-    }
-  } catch (error) {
-    console.error("Error calling Gemini API:", error);
-    throw new Error("ไม่สามารถเชื่อมต่อกับ AI ได้ในขณะนี้: " + error.message);
-  }
-}
-
-/**
- * ✅ แก้ไข: Function to save new repair request data with proper RepairId generation
- * @param {Object} formData Form data from the repair request.
- * @returns {boolean} True if saved successfully.
+ * ✅ แก้ไข: Function to save new repair request data - ปรับให้เข้ากับโครงสร้างชีทจริง
  */
 function submitNewRepair(formData) {
   try {
-    // ✅ เพิ่ม: Validate form data
     if (!formData.reporterName || !formData.phoneNumber || !formData.location || !formData.repairType || !formData.repairDesc) {
       throw new Error('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
     }
-    
-    // Validate phone number
+
     if (!validatePhoneNumber(formData.phoneNumber)) {
       throw new Error('รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง');
     }
-    
-    // Validate citizen ID if provided
+
     if (formData.citizenID && !validateCitizenId(formData.citizenID)) {
       throw new Error('หมายเลขประจำตัวประชาชนต้องเป็นตัวเลข 13 หลัก');
     }
@@ -318,79 +246,50 @@ function submitNewRepair(formData) {
     const ss = SpreadsheetApp.openById(SS_ID);
     let sheet = ss.getSheetByName(REPAIRS_SHEET_NAME);
 
-    // Create Repairs sheet and Header if it doesn't exist
     if (!sheet) {
-      sheet = ss.insertSheet(REPAIRS_SHEET_NAME);
-      sheet.appendRow([
-        'ประทับเวลา',
-        'รหัสแจ้งซ่อม', 
-        'ชื่อผู้แจ้ง',
-        'หน่วยงาน',
-        'สถานที่เกิดเหตุ',
-        'เบอร์โทรศัพท์',
-        'หมายเลขประจำตัวประชาชน',
-        'ประเภทการแจ้งซ่อม',
-        'รายละเอียดปัญหา',
-        'PhotoUrl',
-        'GeoStamp',
-        'GeoCode',
-        'GeoAddress',
-        'สถานะ',
-        'ผู้รับผิดชอบ'
-      ]);
+      throw new Error('ไม่พบชีท "การตอบแบบฟอร์ม 1" กรุณาตรวจสอบ');
     }
 
-    // ✅ แก้ไข: Generate RepairId properly
     const now = new Date();
-    const timestamp = Utilities.formatDate(now, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), 'yyyyMMdd-HHmmss');
-    const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    const repairId = `R-${timestamp}-${randomSuffix}`;
-
-    // ✅ แก้ไข: Ensure data is appended correctly
+    
     const rowData = [
-      now, // Timestamp
-      repairId, // ✅ RepairId - This was the main issue!
-      formData.reporterName || '',
-      formData.department || 'ไม่ระบุ', // ✅ Default value
-      formData.location || '',
-      formData.phoneNumber || '',
-      formData.citizenID || '',
-      formData.repairType || '',
-      formData.repairDesc || '',
-      formData.photoUrl || '',
-      formData.geoStamp || '',
-      formData.geoCode || '',
-      formData.geoAddress || '',
-      VALID_STATUSES.REPORTED, // ✅ Use standard status
-      '' // Assignee (empty initially)
+      now, // A: ประทับเวลา
+      formData.email || '', // B: ที่อยู่อีเมล
+      formData.reporterName || '', // C: ชื่อ-นามสกุล
+      '', // D: อายุ
+      formData.citizenID || '', // E: เลขประจำตัวประชาชน
+      formData.location || '', // F: ที่อยู่/สถานที่เกิดเหตุ
+      formData.repairType || '', // G: ประเภทการแจ้งซ่อม
+      formData.repairDesc || '', // H: รายละเอียดของปัญหา
+      formData.photoUrl || '', // I: รูปภาพ
+      formData.geoStamp || '', // J: GeoStamp
+      formData.geoCode || '', // K: GeoCode
+      formData.geoAddress || '', // L: GeoAddress
+      'ถนน', // M: สถานะ
+      '' // N: ผู้รับผิดชอบ
     ];
 
-    // ✅ เพิ่ม: Logging for debugging
-    console.log('Saving repair data:', {
-      repairId: repairId,
-      reporterName: formData.reporterName,
-      status: VALID_STATUSES.REPORTED
-    });
-
     sheet.appendRow(rowData);
-    
-    // ✅ เพิ่ม: Clear cache to refresh dashboard
+
     const cache = CacheService.getUserCache();
     cache.remove('dashboard_summary_cache');
-    
+    cache.remove('repair_data_cache');
+
+    console.log('✅ บันทึกข้อมูลสำเร็จ:', {
+      name: formData.reporterName,
+      type: formData.repairType,
+      location: formData.location
+    });
+
     return true;
-    
   } catch (error) {
-    console.error('Error in submitNewRepair:', error);
+    console.error('❌ Error in submitNewRepair:', error);
     throw new Error(`เกิดข้อผิดพลาดในการบันทึกข้อมูล: ${error.message}`);
   }
 }
 
 /**
- * ✅ แก้ไข: Function to retrieve repair request data with better error handling
- * Returns properties with exact header names (Thai headers).
- * @returns {Array<Object>} An array of repair data objects.
- * @throws {Error} If the user is not logged in.
+ * ✅ แก้ไข: Function to retrieve repair data - ปรับให้เข้ากับโครงสร้างชีทจริง
  */
 function getRepairData() {
   try {
@@ -399,225 +298,103 @@ function getRepairData() {
       throw new Error('กรุณาเข้าสู่ระบบก่อน');
     }
 
-    const sheet = SpreadsheetApp.openById(SS_ID).getSheetByName(REPAIRS_SHEET_NAME);
-    if (!sheet) {
-      console.log('Repairs sheet not found');
-      return []; // Return empty array instead of null
+    const cachedData = cache.get('repair_data_cache');
+    if (cachedData) {
+      return JSON.parse(cachedData);
     }
+
+    const ss = SpreadsheetApp.openById(SS_ID);
+    const sheet = ss.getSheetByName(REPAIRS_SHEET_NAME);
     
+    if (!sheet) {
+      return [];
+    }
+
     const lastRow = sheet.getLastRow();
     if (lastRow < 2) {
-      console.log('No data in repairs sheet');
-      return []; // Return empty array instead of null
+      return [];
     }
 
-    const range = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn());
-    const values = range.getValues();
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const data = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
 
-    console.log('Headers found:', headers);
-    console.log('Data rows count:', values.length);
+    console.log('🔍 Headers found:', headers);
+    console.log('📊 Data rows count:', data.length);
 
-    // ✅ แก้ไข: Map values using Thai headers and handle null values
-    const data = values.map((row, index) => {
-      const item = {};
-      headers.forEach((header, colIndex) => {
-        if (header === 'ประทับเวลา' && row[colIndex] instanceof Date) {
-          // Format Timestamp for display
-          item[header] = Utilities.formatDate(row[colIndex], SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), 'dd/MM/yyyy HH:mm');
-        } else {
-          // Handle null/undefined values
-          item[header] = row[colIndex] != null ? row[colIndex] : '';
-        }
-      });
-      
-      // ✅ เพิ่ม: Generate RepairId if missing
-      if (!item['รหัสแจ้งซ่อม'] || item['รหัสแจ้งซ่อม'] === '') {
-        const timestamp = new Date();
-        const timestampStr = Utilities.formatDate(timestamp, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), 'yyyyMMdd-HHmmss');
-        item['รหัสแจ้งซ่อม'] = `R-${timestampStr}-${(index + 1).toString().padStart(3, '0')}`;
-        
-        // ✅ อัปเดต RepairId กลับไปในชีท
-        const repairIdColIndex = headers.indexOf('รหัสแจ้งซ่อม');
-        if (repairIdColIndex !== -1) {
-          sheet.getRange(index + 2, repairIdColIndex + 1).setValue(item['รหัสแจ้งซ่อม']);
-        }
-      }
-      
+    const repairData = data.map((row, index) => {
+      const item = {
+        'รหัสแจ้งซ่อม': `REP-${index + 1}`.padStart(10, '0'),
+        'ประทับเวลา': formatDateForDisplay(row[0]), // A
+        'ที่อยู่อีเมล': row[1] || '', // B
+        'ชื่อผู้แจ้ง': row[2] || '', // C
+        'อายุ': row[3] || '', // D
+        'เลขประจำตัวประชาชน': row[4] || '', // E
+        'สถานที่เกิดเหตุ': row[5] || '', // F
+        'ประเภทการแจ้งซ่อม': row[6] || '', // G
+        'รายละเอียดปัญหา': row[7] || '', // H
+        'รูปภาพ': row[8] || '', // I
+        'GeoStamp': row[9] || '', // J
+        'GeoCode': row[10] || '', // K
+        'GeoAddress': row[11] || '', // L
+        'สถานะ': row[12] || 'ถนน', // M
+        'ผู้รับผิดชอบ': row[13] || '' // N
+      };
       return item;
     });
 
-    console.log('Processed data:', data.length, 'items');
-    return data.reverse(); // Display latest data first
+    console.log('✅ Processed repair data:', repairData.length, 'items');
+
+    cache.put('repair_data_cache', JSON.stringify(repairData), 300);
     
+    return repairData.reverse();
   } catch (error) {
-    console.error('Error in getRepairData:', error);
-    
-    // ถ้าเป็น login error ให้ throw ต่อไป
+    console.error('❌ Error in getRepairData:', error);
+
     if (error.message.includes('เข้าสู่ระบบ')) {
       throw error;
     }
-    
-    // Error อื่นๆ ให้ return empty array
+
     return [];
   }
 }
 
 /**
- * ✅ แก้ไข: Function to retrieve detailed repair information by RepairId
- * @param {string} repairId The ID of the repair request.
- * @returns {Object|null} The repair detail object, or null if not found.
- * @throws {Error} If the user is not logged in or no repair data is found.
+ * ✅ เพิ่ม: Function to get repair data for web display
  */
-function getRepairDetails(repairId) {
-  const cache = CacheService.getUserCache();
-  if (!cache.get(LOGIN_STATUS_KEY)) {
-    throw new Error('กรุณาเข้าสู่ระบบก่อน');
+function getRepairDataForWeb() {
+  try {
+    const repairData = getRepairData();
+    
+    const webData = repairData.map((item, index) => ({
+      id: item['รหัสแจ้งซ่อม'] || `REP-${index + 1}`.padStart(10, '0'),
+      timestamp: item['ประทับเวลา'] || '',
+      email: item['ที่อยู่อีเมล'] || '',
+      name: item['ชื่อผู้แจ้ง'] || '',
+      age: item['อายุ'] || '',
+      citizenID: item['เลขประจำตัวประชาชน'] || '',
+      location: item['สถานที่เกิดเหตุ'] || '',
+      type: item['ประเภทการแจ้งซ่อม'] || '',
+      details: item['รายละเอียดปัญหา'] || '',
+      imageUrl: item['รูปภาพ'] || '',
+      geoStamp: item['GeoStamp'] || '',
+      geoCode: item['GeoCode'] || '',
+      geoAddress: item['GeoAddress'] || '',
+      status: item['สถานะ'] || 'ถนน',
+      assignee: item['ผู้รับผิดชอบ'] || '',
+      phone: '', // ไม่มีในชีทปัจจุบัน
+      department: '' // ไม่มีในชีทปัจจุบัน
+    }));
+    
+    console.log('🌐 Web data prepared:', webData.length, 'items');
+    return webData;
+  } catch (error) {
+    console.error('❌ Error in getRepairDataForWeb:', error);
+    throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูลสำหรับเว็บ: ' + error.message);
   }
-
-  const sheet = SpreadsheetApp.openById(SS_ID).getSheetByName(REPAIRS_SHEET_NAME);
-  if (!sheet || sheet.getLastRow() < 2) {
-    throw new Error('ไม่พบข้อมูลการแจ้งซ่อม');
-  }
-
-  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-
-  for (let i = 0; i < values.length; i++) {
-    const row = values[i];
-    // ✅ แก้ไข: Find RepairId column using Thai header
-    const repairIdColIndex = headers.indexOf('รหัสแจ้งซ่อม');
-    if (repairIdColIndex !== -1 && row[repairIdColIndex] === repairId) {
-      const detail = {};
-      headers.forEach((header, index) => {
-        detail[header] = row[index] || '';
-      });
-      // Format timestamp for display
-      if (detail['ประทับเวลา'] instanceof Date) {
-        detail['ประทับเวลา'] = Utilities.formatDate(detail['ประทับเวลา'], SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), 'dd/MM/yyyy HH:mm');
-      }
-      return detail;
-    }
-  }
-  return null; // Not found
 }
 
 /**
- * ✅ แก้ไข: Updates a specific repair record in the sheet
- * @param {string} repairId The ID of the repair to update.
- * @param {Object} updatedData The data object containing fields to update.
- * @returns {boolean} True if update is successful.
- * @throws {Error} If user not logged in, sheet not found, or repairId not found.
- */
-function updateRepair(repairId, updatedData) {
-  const cache = CacheService.getUserCache();
-  if (!cache.get(LOGIN_STATUS_KEY)) {
-    throw new Error('กรุณาเข้าสู่ระบบก่อน');
-  }
-
-  const sheet = SpreadsheetApp.openById(SS_ID).getSheetByName(REPAIRS_SHEET_NAME);
-  if (!sheet) {
-    throw new Error('ไม่พบชีทแจ้งซ่อม');
-  }
-
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
-
-  let rowIndex = -1;
-  const repairIdColIndex = headers.indexOf('รหัสแจ้งซ่อม'); // ✅ Use Thai header
-
-  if (repairIdColIndex === -1) {
-    throw new Error('ไม่พบคอลัมน์รหัสแจ้งซ่อมในชีท');
-  }
-
-  // Find the row index of the repairId
-  for (let i = 0; i < data.length; i++) {
-    if (data[i][repairIdColIndex] === repairId) {
-      rowIndex = i + 2; // +2 because sheet data starts from row 2
-      break;
-    }
-  }
-
-  if (rowIndex === -1) {
-    throw new Error('ไม่พบรายการแจ้งซ่อมที่ระบุ');
-  }
-
-  // Get current row values
-  const rowToUpdateRange = sheet.getRange(rowIndex, 1, 1, sheet.getLastColumn());
-  const rowValues = rowToUpdateRange.getValues()[0];
-
-  // ✅ เพิ่ม: Validate status before updating
-  if (updatedData['สถานะ'] && !Object.values(VALID_STATUSES).includes(updatedData['สถานะ'])) {
-    throw new Error('สถานะไม่ถูกต้อง');
-  }
-
-  // Update values
-  for (const key in updatedData) {
-    const headerIndex = headers.indexOf(key);
-    if (headerIndex !== -1) {
-      rowValues[headerIndex] = updatedData[key];
-    }
-  }
-
-  sheet.getRange(rowIndex, 1, 1, sheet.getLastColumn()).setValues([rowValues]);
-  
-  // ✅ เพิ่ม: Clear cache
-  cache.remove('dashboard_summary_cache');
-  
-  return true;
-}
-
-/**
- * ✅ แก้ไข: Deletes a specific repair record from the sheet
- * @param {string} repairId The ID of the repair to delete.
- * @returns {boolean} True if deletion is successful.
- * @throws {Error} If user not logged in, sheet not found, or repairId not found.
- */
-function deleteRepair(repairId) {
-  const cache = CacheService.getUserCache();
-  if (!cache.get(LOGIN_STATUS_KEY)) {
-    throw new Error('กรุณาเข้าสู่ระบบก่อน');
-  }
-
-  const sheet = SpreadsheetApp.openById(SS_ID).getSheetByName(REPAIRS_SHEET_NAME);
-  if (!sheet) {
-    throw new Error('ไม่พบชีทแจ้งซ่อม');
-  }
-
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
-
-  let rowIndexToDelete = -1;
-  const repairIdColIndex = headers.indexOf('รหัสแจ้งซ่อม'); // ✅ Use Thai header
-
-  if (repairIdColIndex === -1) {
-    throw new Error('ไม่พบคอลัมน์รหัสแจ้งซ่อมในชีท');
-  }
-
-  // Find the row index of the repairId
-  for (let i = 0; i < data.length; i++) {
-    if (data[i][repairIdColIndex] === repairId) {
-      rowIndexToDelete = i + 2;
-      break;
-    }
-  }
-
-  if (rowIndexToDelete === -1) {
-    throw new Error('ไม่พบรายการแจ้งซ่อมที่ระบุสำหรับการลบ');
-  }
-
-  sheet.deleteRow(rowIndexToDelete);
-  
-  // ✅ เพิ่ม: Clear cache
-  cache.remove('dashboard_summary_cache');
-  
-  return true;
-}
-
-/**
- * ✅ แก้ไข: Retrieves summary data for the dashboard with better error handling
- * @returns {Object} An object containing total, reported, inProgress, completed, cancelled repair counts.
- * @throws {Error} If the user is not logged in.
+ * ✅ แก้ไข: Retrieves summary data for dashboard
  */
 function getDashboardSummary() {
   try {
@@ -626,16 +403,16 @@ function getDashboardSummary() {
       throw new Error('กรุณาเข้าสู่ระบบก่อน');
     }
 
-    // ✅ เพิ่ม: Check cache first
     const cachedSummary = cache.get('dashboard_summary_cache');
     if (cachedSummary) {
-      console.log('Returning cached dashboard summary');
+      console.log('📊 Returning cached dashboard summary');
       return JSON.parse(cachedSummary);
     }
 
-    const sheet = SpreadsheetApp.openById(SS_ID).getSheetByName(REPAIRS_SHEET_NAME);
+    const ss = SpreadsheetApp.openById(SS_ID);
+    const sheet = ss.getSheetByName(REPAIRS_SHEET_NAME);
+    
     if (!sheet) {
-      console.log('Repairs sheet not found, returning empty summary');
       const emptySummary = { total: 0, reported: 0, inProgress: 0, completed: 0, cancelled: 0 };
       cache.put('dashboard_summary_cache', JSON.stringify(emptySummary), 300);
       return emptySummary;
@@ -643,102 +420,302 @@ function getDashboardSummary() {
 
     const lastRow = sheet.getLastRow();
     if (lastRow < 2) {
-      console.log('No data in repairs sheet, returning empty summary');
       const emptySummary = { total: 0, reported: 0, inProgress: 0, completed: 0, cancelled: 0 };
       cache.put('dashboard_summary_cache', JSON.stringify(emptySummary), 300);
       return emptySummary;
     }
 
-    const values = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
-    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-    
-    console.log('Headers found:', headers);
-    console.log('Data rows:', values.length);
+    const data = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
 
-    // ✅ แก้ไข: Find status column more flexibly
-    let statusColIndex = -1;
-    const possibleStatusHeaders = ['สถานะ', 'Status', 'status'];
-    
-    for (let i = 0; i < headers.length; i++) {
-      if (possibleStatusHeaders.includes(headers[i])) {
-        statusColIndex = i;
-        break;
-      }
-    }
+    console.log('📊 Data rows:', data.length);
 
-    if (statusColIndex === -1) {
-      console.error('Status column not found. Available headers:', headers);
-      throw new Error('ไม่พบคอลัมน์สถานะในชีทแจ้งซ่อม');
-    }
-
-    console.log('Status column found at index:', statusColIndex);
-
-    let total = values.length;
+    let total = data.length;
     let reported = 0;
     let inProgress = 0;
     let completed = 0;
     let cancelled = 0;
 
-    // ✅ แก้ไข: Count statuses more flexibly
-    values.forEach((row, index) => {
-      const status = String(row[statusColIndex] || '').trim();
-      console.log(`Row ${index + 1} status:`, status);
-      
-      // ปรับให้รองรับทั้งชื่อเก่าและใหม่
-      switch (status) {
-        case 'แจ้งซ่อมแล้ว':
+    data.forEach((row, index) => {
+      const status = String(row[12] || '').trim(); // คอลัมน์ M = สถานะ
+      console.log(`📝 Row ${index + 1} status:`, status);
+
+      switch (status.toLowerCase()) {
+        case 'ถนน':
         case 'รอซ่อม':
-        case VALID_STATUSES.REPORTED:
+        case 'แจ้งซ่อมแล้ว':
           reported++;
           break;
         case 'กำลังดำเนินการ':
-        case 'กำลังติดตาม':
-        case VALID_STATUSES.IN_PROGRESS:
+        case 'กำลังซ่อม':
+        case 'ดำเนินการ':
           inProgress++;
           break;
         case 'เสร็จเรียบร้อย':
-        case VALID_STATUSES.COMPLETED:
+        case 'เสร็จสิ้น':
+        case 'สำเร็จ':
           completed++;
           break;
         case 'ยกเลิก':
-        case VALID_STATUSES.CANCELLED:
+        case 'ปิด':
+        case 'ไม่อนุมัติ':
           cancelled++;
           break;
         default:
-          console.log('Unknown status found:', status);
-          // นับเป็น reported ถ้าไม่รู้จักสถานะ
+          console.log('❓ Unknown status found:', status);
           reported++;
           break;
       }
     });
 
-    const summary = { 
-      total: total, 
-      reported: reported, 
-      inProgress: inProgress, 
-      completed: completed, 
-      cancelled: cancelled 
+    const summary = {
+      total: total,
+      reported: reported,
+      inProgress: inProgress,
+      completed: completed,
+      cancelled: cancelled
     };
-    
-    console.log('Dashboard summary calculated:', summary);
-    
-    // ✅ เพิ่ม: Cache the result
-    cache.put('dashboard_summary_cache', JSON.stringify(summary), 300); // Cache for 5 minutes
-    
+
+    console.log('📈 Dashboard summary calculated:', summary);
+
+    cache.put('dashboard_summary_cache', JSON.stringify(summary), 300);
+
     return summary;
-    
   } catch (error) {
-    console.error('Error in getDashboardSummary:', error);
-    
-    // ✅ เพิ่ม: Return empty summary on error instead of throwing
-    const emptySummary = { total: 0, reported: 0, inProgress: 0, completed: 0, cancelled: 0 };
-    
-    // ถ้าเป็น login error ให้ throw ต่อไป
+    console.error('❌ Error in getDashboardSummary:', error);
+
     if (error.message.includes('เข้าสู่ระบบ')) {
       throw error;
     }
+
+    return { total: 0, reported: 0, inProgress: 0, completed: 0, cancelled: 0 };
+  }
+}
+
+/**
+ * Helper function สำหรับการจัดรูปแบบวันที่
+ */
+function formatDateForDisplay(dateValue) {
+  if (!dateValue) return '';
+  
+  let date;
+  if (dateValue instanceof Date) {
+    date = dateValue;
+  } else if (typeof dateValue === 'string') {
+    date = new Date(dateValue);
+  } else {
+    return dateValue.toString();
+  }
+  
+  if (isNaN(date.getTime())) {
+    return dateValue.toString();
+  }
+  
+  return Utilities.formatDate(date, 'Asia/Bangkok', 'dd/MM/yyyy HH:mm');
+}
+
+/**
+ * ฟังก์ชันสำหรับประมวลผลการเข้าสู่ระบบจาก Frontend
+ */
+function processLogin(username, password) {
+  Logger.log("Attempting login for username: " + username);
+  try {
+    const userSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(USERS_SHEET_NAME);
+    if (!userSheet) {
+      Logger.log('Error: "' + USERS_SHEET_NAME + '" sheet not found for login.');
+      return { success: false, message: 'ไม่พบฐานข้อมูลผู้ใช้งาน กรุณาติดต่อผู้ดูแลระบบ' };
+    }
+
+    const data = userSheet.getDataRange().getValues();
+    if (data.length < 2) {
+      return { success: false, message: 'ไม่พบผู้ใช้งานในระบบ' };
+    }
+
+    const headers = data[0];
+    const usernameColIndex = headers.indexOf('Username');
+    const passwordColIndex = headers.indexOf('Password');
+
+    if (usernameColIndex === -1 || passwordColIndex === -1) {
+      Logger.log('Error: Missing "Username" or "Password" columns in "' + USERS_SHEET_NAME + '" sheet.');
+      return { success: false, message: 'โครงสร้างฐานข้อมูลผู้ใช้งานไม่ถูกต้อง' };
+    }
+
+    const hashedPassword = hashPassword(password);
+
+    for (let i = 1; i < data.length; i++) {
+      const rowUsername = String(data[i][usernameColIndex]).trim();
+      const rowStoredPassword = String(data[i][passwordColIndex]).trim();
+
+      if (rowUsername === username && (rowStoredPassword === password || rowStoredPassword === hashedPassword)) {
+        Logger.log("Login successful for username: " + username);
+        const cache = CacheService.getUserCache();
+        cache.put(LOGIN_STATUS_KEY, username, 21600);
+        return { success: true, message: 'เข้าสู่ระบบสำเร็จ' };
+      }
+    }
+
+    Logger.log("Login failed for username: " + username + " - Invalid credentials.");
+    return { success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' };
+
+  } catch (e) {
+    Logger.log("Error in processLogin: " + e.message);
+    return { success: false, message: 'เกิดข้อผิดพลาดขณะเข้าสู่ระบบ กรุณาลองใหม่: ' + e.message };
+  }
+}
+
+/**
+ * ฟังก์ชันสำหรับประมวลผลการลงทะเบียนผู้ใช้ใหม่จาก Frontend
+ */
+function processRegistration(formData) {
+  Logger.log("Attempting registration for username: " + formData.username);
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let userSheet = ss.getSheetByName(USERS_SHEET_NAME);
+
+    if (!userSheet) {
+      Logger.log('Creating new "' + USERS_SHEET_NAME + '" sheet.');
+      userSheet = ss.insertSheet(USERS_SHEET_NAME);
+      userSheet.appendRow(['FullName', 'Phone', 'Email', 'Username', 'Password', 'Position', 'RegistrationDate']);
+    }
+
+    const lastRow = userSheet.getLastRow();
+    if (lastRow > 1) {
+      const headers = userSheet.getRange(1, 1, 1, userSheet.getLastColumn()).getValues()[0];
+      const usernameColIndex = headers.indexOf('Username');
+      if (usernameColIndex === -1) {
+        throw new Error('ไม่พบหัวข้อคอลัมน์ "Username" ในชีทผู้ใช้งาน');
+      }
+
+      const existingUsernames = userSheet.getRange(2, usernameColIndex + 1, lastRow - 1, 1).getValues().flat();
+      if (existingUsernames.includes(formData.username)) {
+        Logger.log("Registration failed: Username already exists.");
+        return { success: false, message: 'ชื่อผู้ใช้นี้มีคนใช้แล้ว' };
+      }
+    }
+
+    const hashedPassword = hashPassword(formData.password);
+
+    userSheet.appendRow([
+      formData.fullName,
+      formData.phone,
+      formData.email,
+      formData.username,
+      hashedPassword,
+      formData.position,
+      new Date()
+    ]);
+
+    Logger.log("Registration successful for username: " + formData.username);
+    return { success: true, message: 'ลงทะเบียนสำเร็จ' };
+
+  } catch (e) {
+    Logger.log("Error in processRegistration: " + e.message);
+    return { success: false, message: 'เกิดข้อผิดพลาดขณะลงทะเบียน กรุณาลองใหม่: ' + e.message };
+  }
+}
+
+// ✅ เพิ่ม: Navigation Functions - ฟังก์ชันการนำทาง
+
+/**
+ * Get Dashboard Page - ไปหน้าหลัก
+ */
+function getDashboardPage() {
+  const cache = CacheService.getUserCache();
+  const loggedInUser = cache.get(LOGIN_STATUS_KEY);
+  if (loggedInUser) {
+    return HtmlService.createTemplateFromFile('Dashboard').evaluate().getContent();
+  } else {
+    throw new Error('กรุณาเข้าสู่ระบบก่อน');
+  }
+}
+
+/**
+ * Navigate to Dashboard - ไปหน้าหลัก
+ */
+function navigateToDashboard() {
+  try {
+    const cache = CacheService.getUserCache();
+    if (!cache.get(LOGIN_STATUS_KEY)) {
+      throw new Error('กรุณาเข้าสู่ระบบก่อน');
+    }
+    return HtmlService.createTemplateFromFile('Dashboard').evaluate().getContent();
+  } catch (error) {
+    throw new Error('เกิดข้อผิดพลาดในการโหลดหน้าหลัก: ' + error.message);
+  }
+}
+
+/**
+ * Navigate to Report Repair - ไปหน้าแจ้งซ่อม
+ */
+function navigateToReportRepair() {
+  try {
+    const cache = CacheService.getUserCache();
+    if (!cache.get(LOGIN_STATUS_KEY)) {
+      throw new Error('กรุณาเข้าสู่ระบบก่อน');
+    }
+    return HtmlService.createTemplateFromFile('report_repair').evaluate().getContent();
+  } catch (error) {
+    throw new Error('เกิดข้อผิดพลาดในการโหลดหน้าแจ้งซ่อม: ' + error.message);
+  }
+}
+
+/**
+ * Navigate to Status - ไปหน้าจัดการแจ้งซ่อม
+ */
+function navigateToStatus() {
+  try {
+    const cache = CacheService.getUserCache();
+    if (!cache.get(LOGIN_STATUS_KEY)) {
+      throw new Error('กรุณาเข้าสู่ระบบก่อน');
+    }
+    return HtmlService.createTemplateFromFile('status').evaluate().getContent();
+  } catch (error) {
+    throw new Error('เกิดข้อผิดพลาดในการโหลดหน้าจัดการแจ้งซ่อม: ' + error.message);
+  }
+}
+
+/**
+ * Get logged in user info for display
+ */
+function getLoggedInUserInfo() {
+  try {
+    const cache = CacheService.getUserCache();
+    const loggedInUser = cache.get(LOGIN_STATUS_KEY);
     
-    // Error อื่นๆ ให้ return empty summary
-    return emptySummary;
+    if (!loggedInUser) {
+      return null;
+    }
+
+    const ss = SpreadsheetApp.openById(SS_ID);
+    const userSheet = ss.getSheetByName(USERS_SHEET_NAME);
+    
+    if (!userSheet) {
+      return { username: loggedInUser, fullname: loggedInUser, position: 'ผู้ใช้งาน' };
+    }
+
+    const headers = userSheet.getRange(1, 1, 1, userSheet.getLastColumn()).getValues()[0];
+    const data = userSheet.getRange(2, 1, userSheet.getLastRow() - 1, userSheet.getLastColumn()).getValues();
+    
+    const usernameColIndex = headers.indexOf('Username');
+    const fullnameColIndex = headers.indexOf('FullName');
+    const positionColIndex = headers.indexOf('Position');
+
+    if (usernameColIndex === -1) {
+      return { username: loggedInUser, fullname: loggedInUser, position: 'ผู้ใช้งาน' };
+    }
+
+    const userRow = data.find(row => String(row[usernameColIndex]).trim() === loggedInUser);
+    
+    if (userRow) {
+      return {
+        username: loggedInUser,
+        fullname: userRow[fullnameColIndex] || loggedInUser,
+        position: userRow[positionColIndex] || 'ผู้ใช้งาน'
+      };
+    }
+
+    return { username: loggedInUser, fullname: loggedInUser, position: 'ผู้ใช้งาน' };
+  } catch (error) {
+    console.error('Error getting user info:', error);
+    return { username: 'ผู้ใช้งาน', fullname: 'ผู้ใช้งาน', position: 'ผู้ใช้งาน' };
   }
 }

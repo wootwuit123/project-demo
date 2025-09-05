@@ -7,224 +7,500 @@
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
   <style>
-    /* Global styles and overrides for body and general layout */
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
       font-family: 'Prompt', sans-serif;
-      background: linear-gradient(135deg,#8A2BE2,#D291BC);
-      min-height: 100vh;
+      background: #f5f7fa;
+      color: #2c3e50;
       display: flex;
-      flex-direction: column;
-      color: #333;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    /* Top Navbar */
-    .topnav {
+
+    /* Top Header Bar */
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background-color: #1976D2;
       padding: 0 1.5rem;
-      height: 60px;
-      color: #fff;
+      z-index: 1001;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
-    .topnav .left {
+
+    .header-left {
       display: flex;
       align-items: center;
+      color: #fff;
     }
-    .topnav .left i {
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: #fff;
       font-size: 1.5rem;
-      margin-right: 0.8rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      margin-right: 1rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
     }
-    .topnav .left .title {
-      font-size: 1.2rem;
+
+    .menu-toggle:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-1px);
+    }
+
+    .header-title {
+      font-size: 1.3rem;
       font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
-    .topnav .right {
+
+    .header-icon {
+      margin-right: 0.8rem;
+      font-size: 1.4rem;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+    }
+
+    .header-right {
       display: flex;
       align-items: center;
     }
-    .topnav .right a {
-      color: #fff;
-      text-decoration: none;
-      margin: 0 0.8rem;
-      font-weight: 500;
-      position: relative;
-      padding: 0.3rem 0.4rem;
-      transition: background .2s;
-      cursor: pointer;
-    }
-    .topnav .right a:hover {
-      background: rgba(255,255,255,0.2);
-      border-radius: 4px;
-    }
-    /* user menu - existing styles */
+
+    /* User Menu in Header */
     .user-menu {
       position: relative;
-      display: flex; /* Ensure flex for alignment of new elements */
-      align-items: center; /* Align items vertically */
-      gap: 0.5rem; /* Space between image and text */
-      margin-left: 0.8rem; /* Add some margin to separate from navigation links */
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-left: 1rem;
+      padding: 0.4rem 1rem;
+      border-radius: 25px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
     }
+
+    .user-menu:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
     .user-menu img {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.3);
+      transition: all 0.2s ease;
     }
-    /* Styles for the new user info display */
+
+    .user-menu:hover img {
+      transform: scale(1.05);
+      border-color: rgba(255,255,255,0.5);
+    }
+
     .user-info-display {
       display: flex;
       flex-direction: column;
-      align-items: flex-start; /* Align text to the left within its container */
-      color: #e0f7fa; /* Light blue text for visibility on dark background */
-      font-size: 0.95rem;
-      line-height: 1.2; /* Adjust line height for better spacing */
-    }
-    .user-info-display .username {
-      font-weight: 600;
-      color: #fff; /* Keep username white */
-    }
-    .user-info-display .position {
-      font-size: 0.8em; /* Slightly smaller for position */
-      color: #b3e0ff; /* Lighter blue for position */
+      align-items: flex-start;
+      color: #e3f2fd;
+      font-size: 0.9rem;
+      line-height: 1.3;
     }
 
-    /* user dropdown - existing styles */
+    .user-info-display .username {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .user-info-display .position {
+      font-size: 0.8rem;
+      color: #bbdefb;
+      opacity: 0.9;
+    }
+
     .user-menu .dropdown {
       display: none;
       position: absolute;
       right: 0;
-      top: 44px;
+      top: 100%;
+      margin-top: 8px;
       background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
       overflow: hidden;
-      min-width: 140px;
-      z-index: 1000;
+      min-width: 180px;
+      z-index: 1002;
+      border: 1px solid rgba(0,0,0,0.05);
     }
+
     .user-menu .dropdown a {
-      display: block;
-      padding: 0.6rem 1rem;
-      color: #333;
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      color: #2c3e50;
       text-decoration: none;
       font-size: 0.95rem;
-      transition: background .2s;
+      transition: all 0.2s ease;
+      gap: 0.8rem;
     }
+
     .user-menu .dropdown a:hover {
-      background: #f1f1f1;
+      background: #f8f9fa;
+      color: #1976D2;
+      padding-left: 1.5rem;
     }
-    /* Keep dropdown visible on hover over entire user-menu */
+
     .user-menu:hover .dropdown {
       display: block;
     }
 
-    /* Main Content */
-    .main {
-      padding: 1.5rem;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      color: #fff;
-    }
-    .main h2 {
-      font-size: 2.2rem;
-      margin-bottom: 1.5rem;
-      color: #fff;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-    }
-    .main p {
-      font-size: 1.1rem;
-      line-height: 1.5;
-      margin-bottom: 2rem;
+    /* Professional Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 60px;
+      left: -300px;
+      width: 300px;
+      height: calc(100vh - 60px);
+      background: linear-gradient(180deg, #34495e 0%, #2c3e50 100%);
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 3px solid #3498db;
     }
 
-    /* Dashboard Cards */
-    .dashboard-cards {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.5rem;
-      width: 100%;
-      max-width: 1000px;
-      margin-bottom: 2rem;
+    .sidebar.open {
+      left: 0;
     }
-    .card {
-      background: rgba(255,255,255,0.9);
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+
+    .sidebar-header {
       padding: 1.5rem;
+      background: rgba(0,0,0,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       text-align: center;
-      flex: 1 1 calc(25% - 1.5rem);
-      min-width: 200px;
+    }
+
+    .sidebar-header .logo {
+      font-size: 1.8rem;
+      color: #3498db;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-header .title {
+      color: #ecf0f1;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .sidebar-nav {
+      padding: 1rem 0;
+    }
+
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-section-title {
+      padding: 0.8rem 1.5rem 0.5rem;
+      color: #95a5a6;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-nav a {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      padding: 1rem 1.5rem;
+      color: #bdc3c7;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+      font-weight: 500;
+      position: relative;
     }
+
+    .sidebar-nav a:hover {
+      background: rgba(52, 152, 219, 0.15);
+      border-left-color: #3498db;
+      color: #ecf0f1;
+      padding-left: 2rem;
+      transform: translateX(5px);
+    }
+
+    .sidebar-nav a.active {
+      background: linear-gradient(90deg, rgba(231, 76, 60, 0.2) 0%, rgba(231, 76, 60, 0.05) 100%);
+      border-left-color: #e74c3c;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .sidebar-nav a.active::after {
+      content: '';
+      position: absolute;
+      right: 1rem;
+      width: 8px;
+      height: 8px;
+      background: #e74c3c;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+    }
+
+    .sidebar-nav a i {
+      width: 24px;
+      margin-right: 1rem;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .sidebar-nav a span {
+      flex-grow: 1;
+    }
+
+    /* Overlay */
+    .sidebar-overlay {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 60px);
+      background: rgba(0,0,0,0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 999;
+      backdrop-filter: blur(2px);
+    }
+
+    .sidebar-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Main Content */
+    .main-wrapper {
+      flex: 1;
+      margin-top: 60px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main {
+      padding: 2rem;
+      min-height: calc(100vh - 60px);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f3f4;
+    }
+
+    .page-header h2 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #1976D2;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .page-header p {
+      font-size: 1.2rem;
+      color: #546e7a;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Professional Dashboard Cards */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+    }
+
     .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.15);
     }
+
     .card .icon {
-      font-size: 2.5rem;
-      margin-bottom: 0.8rem;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--card-color);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
+
     .card .title {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #555;
-      margin-bottom: 0.5rem;
+      color: #546e7a;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .card .value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #333;
-    }
-    .card.total .icon { color: #1976D2; }
-    .card.total .value { color: #1976D2; }
-    .card.reported .icon { color: #FF9800; }
-    .card.reported .value { color: #FF9800; }
-    .card.inProgress .icon { color: #2196F3; }
-    .card.inProgress .value { color: #2196F3; }
-    .card.completed .icon { color: #4CAF50; }
-    .card.completed .value { color: #4CAF50; }
-    .card.cancelled .icon { color: #F44336; }
-    .card.cancelled .value { color: #F44336; }
 
-    /* Chart Placeholder */
+    .card .value {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--card-color);
+      line-height: 1;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card.total {
+      --card-color: #1976D2;
+      --card-color-light: #42a5f5;
+    }
+
+    .card.reported {
+      --card-color: #FF9800;
+      --card-color-light: #ffb74d;
+    }
+
+    .card.inProgress {
+      --card-color: #2196F3;
+      --card-color-light: #64b5f6;
+    }
+
+    .card.completed {
+      --card-color: #4CAF50;
+      --card-color-light: #81c784;
+    }
+
+    .card.cancelled {
+      --card-color: #F44336;
+      --card-color-light: #e57373;
+    }
+
+    /* Professional Chart Section */
     .chart-section {
-      background: rgba(255,255,255,0.9);
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-      padding: 1.5rem;
-      width: 100%;
-      max-width: 1000px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      padding: 2.5rem;
+      border: 1px solid rgba(0,0,0,0.05);
       margin-bottom: 2rem;
-      text-align: left;
-      color: #333;
     }
+
     .chart-section h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: #555;
-    }
-    .chart-placeholder {
-      background: #e0e0e0;
-      height: 250px;
-      border-radius: 8px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #1976D2;
+      margin-bottom: 2rem;
       display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .chart-placeholder {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      height: 300px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: #777;
-      font-style: italic;
+      color: #6c757d;
+      font-size: 1.2rem;
+      font-weight: 500;
+      border: 2px dashed #dee2e6;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-placeholder::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(25, 118, 210, 0.05) 10px,
+        rgba(25, 118, 210, 0.05) 20px
+      );
+      animation: chartPattern 20s linear infinite;
+    }
+
+    @keyframes chartPattern {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .chart-placeholder .chart-icon {
+      font-size: 4rem;
+      color: #1976D2;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+
+    /* Welcome Message */
+    .welcome-section {
+      background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      text-align: center;
+      border: 1px solid rgba(25, 118, 210, 0.1);
+    }
+
+    .welcome-section h3 {
+      font-size: 1.8rem;
+      color: #1976D2;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .welcome-section p {
       font-size: 1.1rem;
+      color: #546e7a;
+      line-height: 1.6;
     }
 
     /* Loading และ Modal styles */
-    .loading-overlay {
+    .loading-overlay, .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -234,192 +510,348 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 1003;
+      backdrop-filter: blur(3px);
     }
-    .loading-content {
+
+    .loading-content, .modal-content {
       background: #fff;
-      border-radius: 10px;
-      padding: 2rem;
+      border-radius: 20px;
+      padding: 3rem;
       text-align: center;
-      color: #333;
+      max-width: 500px;
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
+
     .loading-spinner {
-      border: 4px solid rgba(90, 74, 225, 0.3);
-      border-top: 4px solid #5A4AE1;
+      border: 4px solid rgba(25, 118, 210, 0.2);
+      border-top: 4px solid #1976D2;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
+      margin: 0 auto 20px auto;
     }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .modal-content {
-      background: #fff;
-      border-radius: 10px;
-      padding: 2rem;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-      position: relative;
-    }
-    .modal-content h3 {
-      margin-top: 0;
-      color: #5A4AE1;
-      font-size: 1.4rem;
-      margin-bottom: 0.8rem;
-    }
-    .modal-content p {
-      color: #444;
-      margin-bottom: 1.5rem;
-      line-height: 1.5;
-    }
-    .modal-close-button {
-      background: #5A4AE1;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .modal-close-button:hover {
-      background: #4738BE;
+    .loading-message {
+      font-size: 1.2rem;
+      color: #546e7a;
+      font-weight: 500;
     }
 
-    /* Responsive adjustments */
+    .modal-content h3 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #1976D2;
+      font-weight: 700;
+    }
+
+    .modal-content p {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .modal-close-button {
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+    }
+
+    .modal-close-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .quick-action-btn {
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      color: white;
+      border: none;
+      padding: 1.5rem;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+    }
+
+    .quick-action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
+    }
+
+    .quick-action-btn.secondary {
+      background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+
+    .quick-action-btn.secondary:hover {
+      box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-      .topnav {
-        flex-direction: column;
-        height: auto;
-        padding: 0.8rem 1rem;
-        gap: 0.5rem;
+      .header-bar {
+        padding: 0 1rem;
       }
-      .topnav .left, .topnav .right {
+
+      .header-title {
+        font-size: 1rem;
+      }
+
+      .user-info-display {
+        display: none;
+      }
+
+      .sidebar {
         width: 100%;
-        justify-content: center;
+        left: -100%;
       }
-      .topnav .right {
-        flex-wrap: wrap;
-        gap: 0.8rem;
-        margin-top: 0.5rem;
-      }
-      /* Adjust user-menu for small screens */
-      .user-menu {
-        margin-top: 0.5rem; /* Give some space from nav links */
-        margin-left: 0; /* Remove left margin */
-        justify-content: center; /* Center horizontally */
-        width: 100%; /* Take full width */
-      }
+
       .main {
         padding: 1rem;
       }
-      .main h2 {
-        font-size: 1.8rem;
-      }
-      .main p {
-        font-size: 1rem;
-      }
-      .dashboard-cards {
+
+      .page-header h2 {
+        font-size: 2rem;
         flex-direction: column;
-        align-items: center;
+        gap: 0.5rem;
       }
-      .card {
-        flex: 1 1 100%;
-        max-width: 400px;
+
+      .dashboard-cards {
+        grid-template-columns: 1fr;
       }
+
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+
       .chart-section {
-        padding: 1rem;
+        padding: 1.5rem;
       }
-      .chart-section h3 {
-        font-size: 1.3rem;
+
+      .welcome-section {
+        padding: 1.5rem;
       }
+    }
+
+    @media (min-width: 1200px) {
+      .main-wrapper.sidebar-open {
+        margin-left: 300px;
+      }
+    }
+
+    /* Animation Classes */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .main {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .sidebar.open {
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes countUp {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .card .value {
+      animation: countUp 0.6s ease-out;
+      animation-delay: 0.2s;
+      animation-fill-mode: both;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navbar -->
-  <nav class="topnav">
-    <div class="left">
-      <i class="fas fa-bolt"></i>
-      <div class="title">ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</div>
+  <!-- Header Bar -->
+  <header class="header-bar">
+    <div class="header-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <i class="fas fa-bolt header-icon"></i>
+      <div class="header-title">ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</div>
     </div>
-    <div class="right">
-      <a onclick="loadDashboard()"><i class="fas fa-home"></i> หน้าหลัก</a>
-      <a onclick="loadReportRepair()"><i class="fas fa-plus-circle"></i> แจ้งซ่อมใหม่</a>
-      <a onclick="loadStatus()"><i class="fas fa-tools"></i> จัดการแจ้งซ่อม</a>
-      <a href="#"><i class="fas fa-chart-bar"></i> รายงาน</a>
+    <div class="header-right">
       <div class="user-menu">
-        <img src="https://placehold.co/32x32/cccccc/000000?text=User" alt="User">
-        <!-- START: Added/Modified User Profile Display -->
+        <img src="https://placehold.co/36x36/1976D2/FFFFFF?text=👤" alt="User">
         <div class="user-info-display">
-            <span class="username" id="loggedInUsername">ผู้ใช้งาน</span>
-            <div class="position" id="loggedInUserPosition">ตำแหน่ง</div>
+          <span class="username" id="loggedInUsername">ผู้ดูแลระบบ</span>
+          <div class="position" id="loggedInUserPosition">เจ้าหน้าที่</div>
         </div>
-        <!-- END: Added/Modified User Profile Display -->
         <div class="dropdown">
+          <a href="#"><i class="fas fa-user-cog"></i> โปรไฟล์</a>
           <a href="#"><i class="fas fa-cog"></i> ตั้งค่า</a>
           <a onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
         </div>
       </div>
     </div>
-  </nav>
+  </header>
 
-  <!-- Main Content -->
-  <div class="main">
-    <h2>ภาพรวมสถานะการแจ้งซ่อม</h2>
-    <p>ดูข้อมูลสรุปและสถานะล่าสุดของการแจ้งซ่อมทั้งหมด</p>
-
-    <div class="dashboard-cards" id="dashboard-cards">
-      <div class="card total">
-        <div class="icon"><i class="fas fa-clipboard-list"></i></div>
-        <div class="title">แจ้งซ่อมทั้งหมด</div>
-        <div class="value" id="total-repairs">0</div>
+  <!-- Professional Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="fas fa-tools"></i>
       </div>
-      <div class="card reported">
-        <div class="icon"><i class="fas fa-exclamation-circle"></i></div>
-        <div class="title">แจ้งซ่อมแล้ว</div>
-        <div class="value" id="reported-repairs">0</div>
+      <div class="title">ระบบจัดการแจ้งซ่อม</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">เมนูหลัก</div>
+        <a onclick="loadDashboard()" class="active">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>หน้าหลัก</span>
+        </a>
+        <a onclick="loadReportRepair()">
+          <i class="fas fa-plus-circle"></i>
+          <span>แจ้งซ่อมใหม่</span>
+        </a>
+        <a onclick="loadStatus()">
+          <i class="fas fa-clipboard-list"></i>
+          <span>จัดการแจ้งซ่อม</span>
+        </a>
       </div>
-      <div class="card inProgress">
-        <div class="icon"><i class="fas fa-tools"></i></div>
-        <div class="title">กำลังดำเนินการ</div>
-        <div class="value" id="inProgress-repairs">0</div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">รายงาน</div>
+        <a href="#">
+          <i class="fas fa-chart-bar"></i>
+          <span>รายงาน</span>
+        </a>
+        <a href="#">
+          <i class="fas fa-chart-pie"></i>
+          <span>สถิติ</span>
+        </a>
       </div>
-      <div class="card completed">
-        <div class="icon"><i class="fas fa-check-circle"></i></div>
-        <div class="title">เสร็จเรียบร้อย</div>
-        <div class="value" id="completed-repairs">0</div>
-      </div>
-      <div class="card cancelled">
-        <div class="icon"><i class="fas fa-times-circle"></i></div>
-        <div class="title">ยกเลิก</div>
-        <div class="value" id="cancelled-repairs">0</div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">จัดการระบบ</div>
+        <a href="#">
+          <i class="fas fa-users"></i>
+          <span>จัดการผู้ใช้</span>
+        </a>
+        <a href="#">
+          <i class="fas fa-cogs"></i>
+          <span>ตั้งค่าระบบ</span>
+        </a>
       </div>
     </div>
+  </nav>
 
-    <div class="chart-section">
-      <h3>สถิติการแจ้งซ่อม (กราฟจำลอง)</h3>
-      <div class="chart-placeholder">
-        กราฟจะแสดงที่นี่ (อาจใช้ Chart.js ในอนาคต)
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper" id="mainWrapper">
+    <div class="main">
+      <div class="page-header">
+        <h2>
+          <i class="fas fa-tachometer-alt"></i>
+          ภาพรวมระบบ
+        </h2>
+        <p>ติดตามสถานะการแจ้งซ่อมและดูข้อมูลสรุปทั้งหมดในระบบ</p>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <button class="quick-action-btn" onclick="loadReportRepair()">
+          <i class="fas fa-plus-circle"></i>
+          แจ้งซ่อมใหม่
+        </button>
+        <button class="quick-action-btn secondary" onclick="loadStatus()">
+          <i class="fas fa-list"></i>
+          ดูรายการทั้งหมด
+        </button>
+      </div>
+
+      <!-- Dashboard Cards -->
+      <div class="dashboard-cards" id="dashboard-cards">
+        <div class="card total">
+          <div class="icon"><i class="fas fa-clipboard-list"></i></div>
+          <div class="title">แจ้งซ่อมทั้งหมด</div>
+          <div class="value" id="total-repairs">0</div>
+        </div>
+        <div class="card reported">
+          <div class="icon"><i class="fas fa-clock"></i></div>
+          <div class="title">แจ้งซ่อมแล้ว</div>
+          <div class="value" id="reported-repairs">0</div>
+        </div>
+        <div class="card inProgress">
+          <div class="icon"><i class="fas fa-cogs"></i></div>
+          <div class="title">กำลังดำเนินการ</div>
+          <div class="value" id="inProgress-repairs">0</div>
+        </div>
+        <div class="card completed">
+          <div class="icon"><i class="fas fa-check-circle"></i></div>
+          <div class="title">เสร็จเรียบร้อย</div>
+          <div class="value" id="completed-repairs">0</div>
+        </div>
+        <div class="card cancelled">
+          <div class="icon"><i class="fas fa-times-circle"></i></div>
+          <div class="title">ยกเลิก</div>
+          <div class="value" id="cancelled-repairs">0</div>
+        </div>
+      </div>
+
+      <!-- Welcome Section -->
+      <div class="welcome-section" id="welcome-section" style="display: none;">
+        <h3>ยินดีต้อนรับสู่ระบบแจ้งซ่อมไฟฟ้าสาธารณะ</h3>
+        <p>ยังไม่มีข้อมูลการแจ้งซ่อมในระบบ เริ่มต้นใช้งานโดยการคลิก "แจ้งซ่อมใหม่" เพื่อรายงานปัญหาที่พบ</p>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="chart-section">
+        <h3>
+          <i class="fas fa-chart-area"></i>
+          สถิติการแจ้งซ่อม
+        </h3>
+        <div class="chart-placeholder">
+          <div class="chart-icon">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <div>กราฟแสดงสถิติจะปรากฏที่นี่</div>
+          <small style="margin-top: 0.5rem; opacity: 0.7;">(อาจใช้ Chart.js ในอนาคต)</small>
+        </div>
       </div>
     </div>
   </div>
@@ -428,7 +860,7 @@
   <div id="loading-overlay" class="loading-overlay" style="display: none;">
     <div class="loading-content">
       <div class="loading-spinner"></div>
-      <p id="loading-message">กำลังโหลดข้อมูล...</p>
+      <p id="loading-message" class="loading-message">กำลังโหลดข้อมูล...</p>
     </div>
   </div>
 
@@ -442,9 +874,71 @@
   </div>
 
   <script>
-    // Debug function (ซ่อนอยู่ใน console)
+    // Sidebar functions
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      
+      if (sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    }
+
+    function openSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+      
+      if (window.innerWidth >= 1200) {
+        mainWrapper.classList.add('sidebar-open');
+      }
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+      mainWrapper.classList.remove('sidebar-open');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const menuToggle = document.querySelector('.menu-toggle');
+      
+      if (sidebar.classList.contains('open') && 
+          !sidebar.contains(event.target) && 
+          !menuToggle.contains(event.target)) {
+        closeSidebar();
+      }
+    });
+
+    // Close sidebar on window resize if needed
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 1200) {
+        const sidebar = document.getElementById('sidebar');
+        const mainWrapper = document.getElementById('mainWrapper');
+        if (sidebar.classList.contains('open')) {
+          mainWrapper.classList.add('sidebar-open');
+        }
+      } else {
+        const mainWrapper = document.getElementById('mainWrapper');
+        mainWrapper.classList.remove('sidebar-open');
+      }
+    });
+
+    // Debug function
     function debugLog(message) {
-      console.log('🔧 DEBUG:', message);
+      console.log('🔧 DASHBOARD DEBUG:', message);
     }
 
     // Modal functions
@@ -477,11 +971,13 @@
     // Navigation functions
     function loadDashboard() {
       debugLog('loadDashboard called');
+      closeSidebar();
       location.reload();
     }
 
     function loadReportRepair() {
       debugLog('loadReportRepair called');
+      closeSidebar();
       
       try {
         if (typeof google === 'undefined' || !google.script || !google.script.run) {
@@ -520,6 +1016,7 @@
 
     function loadStatus() {
       debugLog('loadStatus called');
+      closeSidebar();
       
       try {
         if (typeof google === 'undefined' || !google.script || !google.script.run) {
@@ -558,6 +1055,7 @@
 
     function logout() {
       debugLog('logout called');
+      closeSidebar();
       
       showModal('คุณต้องการออกจากระบบหรือไม่?', 'ยืนยันการออกจากระบบ').then(() => {
         try {
@@ -608,17 +1106,21 @@
             debugLog('Dashboard data loaded: ' + JSON.stringify(data));
             hideLoading();
             
-            document.getElementById('total-repairs').textContent = data.total || 0;
-            document.getElementById('reported-repairs').textContent = data.reported || 0;
-            document.getElementById('inProgress-repairs').textContent = data.inProgress || 0;
-            document.getElementById('completed-repairs').textContent = data.completed || 0;
-            document.getElementById('cancelled-repairs').textContent = data.cancelled || 0;
+            // Update dashboard cards with animation
+            updateDashboardCard('total-repairs', data.total || 0);
+            updateDashboardCard('reported-repairs', data.reported || 0);
+            updateDashboardCard('inProgress-repairs', data.inProgress || 0);
+            updateDashboardCard('completed-repairs', data.completed || 0);
+            updateDashboardCard('cancelled-repairs', data.cancelled || 0);
             
-            // แสดงข้อความถ้าไม่มีข้อมูล
+            // Show welcome message if no data
             if (data.total === 0) {
+              document.getElementById('welcome-section').style.display = 'block';
               setTimeout(() => {
-                showModal('ยังไม่มีข้อมูลการแจ้งซ่อมในระบบ<br><br><small>เริ่มต้นใช้งานโดยการคลิก "แจ้งซ่อมใหม่"</small>', 'ยินดีต้อนรับ');
-              }, 500);
+                showModal('ยินดีต้อนรับสู่ระบบแจ้งซ่อมไฟฟ้าสาธารณะ!<br><br>เริ่มต้นใช้งานโดยการคลิก "แจ้งซ่อมใหม่" เพื่อรายงานปัญหาที่พบ', 'ยินดีต้อนรับ');
+              }, 1000);
+            } else {
+              document.getElementById('welcome-section').style.display = 'none';
             }
           })
           .withFailureHandler(e => {
@@ -642,49 +1144,67 @@
       }
     }
 
+    // Animated counter for dashboard cards
+    function updateDashboardCard(elementId, targetValue) {
+      const element = document.getElementById(elementId);
+      const duration = 1000; // 1 second
+      const frameDuration = 1000 / 60; // 60 FPS
+      const totalFrames = Math.round(duration / frameDuration);
+      const easeOutQuad = t => t * (2 - t);
+      
+      let frame = 0;
+      const counter = setInterval(() => {
+        frame++;
+        const progress = easeOutQuad(frame / totalFrames);
+        const currentValue = Math.round(targetValue * progress);
+        
+        element.textContent = currentValue.toLocaleString();
+        
+        if (frame === totalFrames) {
+          clearInterval(counter);
+          element.textContent = targetValue.toLocaleString();
+        }
+      }, frameDuration);
+    }
+
     /**
      * Fetches the logged-in user's details and displays them.
      */
     function fetchAndDisplayUserDetails() {
-        debugLog('fetchAndDisplayUserDetails called');
-        try {
-            // Check if google.script.run is available
-            if (typeof google === 'undefined' || !google.script || !google.script.run) {
-                debugLog('Google Apps Script not ready, cannot fetch user details.');
-                return;
-            }
-
-            google.script.run
-                .withSuccessHandler(userDetails => {
-                    if (userDetails) {
-                        // Update the text content of the elements
-                        document.getElementById('loggedInUsername').textContent = userDetails.username || 'ผู้ใช้งาน';
-                        document.getElementById('loggedInUserPosition').textContent = userDetails.position || 'ไม่ระบุตำแหน่ง';
-                        debugLog('User details displayed: ' + JSON.stringify(userDetails));
-                    } else {
-                        // Handle case where user is not logged in or details are missing
-                        document.getElementById('loggedInUsername').textContent = 'ไม่ได้เข้าสู่ระบบ';
-                        document.getElementById('loggedInUserPosition').textContent = '';
-                        debugLog('No user logged in or details not found.');
-                    }
-                })
-                .withFailureHandler(e => {
-                    // Log error and set placeholder text
-                    console.error('Failed to fetch user details:', e.message);
-                    document.getElementById('loggedInUsername').textContent = 'เกิดข้อผิดพลาด';
-                    document.getElementById('loggedInUserPosition').textContent = '';
-                })
-                .getLoggedInUserDetails(); // Call the Apps Script function
-        } catch (error) {
-            console.error('Error in fetchAndDisplayUserDetails:', error.message);
+      debugLog('fetchAndDisplayUserDetails called');
+      try {
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          debugLog('Google Apps Script not ready, cannot fetch user details.');
+          return;
         }
+
+        google.script.run
+          .withSuccessHandler(userDetails => {
+            if (userDetails) {
+              document.getElementById('loggedInUsername').textContent = userDetails.username || 'ผู้ใช้งาน';
+              document.getElementById('loggedInUserPosition').textContent = userDetails.position || 'ไม่ระบุตำแหน่ง';
+              debugLog('User details displayed: ' + JSON.stringify(userDetails));
+            } else {
+              document.getElementById('loggedInUsername').textContent = 'ไม่ได้เข้าสู่ระบบ';
+              document.getElementById('loggedInUserPosition').textContent = '';
+              debugLog('No user logged in or details not found.');
+            }
+          })
+          .withFailureHandler(e => {
+            console.error('Failed to fetch user details:', e.message);
+            document.getElementById('loggedInUsername').textContent = 'เกิดข้อผิดพลาด';
+            document.getElementById('loggedInUserPosition').textContent = '';
+          })
+          .getLoggedInUserDetails();
+      } catch (error) {
+        console.error('Error in fetchAndDisplayUserDetails:', error.message);
+      }
     }
 
     // Auto-load dashboard data and user details when page loads
     document.addEventListener('DOMContentLoaded', function() {
       debugLog('Dashboard page loaded, initializing...');
       
-      // ตรวจสอบว่า Google Apps Script พร้อมใช้งานหรือไม่
       let attempts = 0;
       const maxAttempts = 10;
       
@@ -695,7 +1215,7 @@
         if (typeof google !== 'undefined' && google.script && google.script.run) {
           debugLog('Google Apps Script is ready');
           setTimeout(loadDashboardSummary, 800);
-          fetchAndDisplayUserDetails(); // Call to fetch and display user details
+          fetchAndDisplayUserDetails();
         } else if (attempts < maxAttempts) {
           debugLog('Google Apps Script not ready yet, retrying...');
           setTimeout(checkGoogleScript, 500);
